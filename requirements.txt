@@ -2,5 +2,6 @@ graphistry[ai]
 networkx
 numpy
 pandas
+requests
 torch
 torch_geometric

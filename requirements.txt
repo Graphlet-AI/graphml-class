@@ -1,2 +1,6 @@
-pandas
+graphistry[ai]
 networkx
+numpy
+pandas
+torch
+torch_geometric

@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  jupyter:
+    image: jupyter/datascience-notebook
+    container_name: jupyter
+    ports:
+      - 8888:8888
+    volumes:
+      - .:/home/jovyan/work
+      - ./data:/home/jovyan/data
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+    env_file:
+      - envs/graphistry.env
+      - envs/search.env
+      - envs/openai.env
+    restart: always

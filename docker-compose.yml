@@ -15,4 +15,5 @@ services:
       - envs/graphistry.env
       - envs/search.env
       - envs/openai.env
+      - .env
     restart: always

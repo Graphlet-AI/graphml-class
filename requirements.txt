@@ -3,5 +3,6 @@ networkx
 numpy
 pandas
 requests
+seaborn
 torch
 torch_geometric

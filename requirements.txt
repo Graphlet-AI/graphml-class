@@ -1,3 +1,4 @@
+python-dateutil
 graphistry[ai]
 networkx
 numpy

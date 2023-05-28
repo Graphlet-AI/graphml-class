@@ -1,8 +1,10 @@
 python-dateutil
 graphistry[ai]
+littleballoffur
 networkx
 numpy
 pandas
+pyg-lib
 requests
 seaborn
 torch

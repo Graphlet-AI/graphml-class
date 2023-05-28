@@ -4,7 +4,26 @@ This is a course from Graphlet AI taught by Russell Jurney.
 
 ## Environment Setup
 
-This project uses Docker: `docker compose up -d && docker logs jupyter -f --tail 100` and visit the url it displays.
+This project uses Docker: 
+
+```bash
+# Run a Jupyter Notebook container in the background with all requirements.txt installed
+docker compose up -d
+# Tail the Jupyter logs to see the JupyterLab url to connect in your browser
+docker logs jupyter -f --tail 100
+```
+
+To shut down docker, be in this folder and type:
+
+```bash
+docker compose down
+```
+
+### `docker compose` vs `docker-compose`
+
+You say potato, I say patato... the docker compose command changed in recent versions :)
+
+NOTE: older versions of docker may use the command `docker-compose` rather than the two word command `docker compose`.
 
 ## VSCode Setup
 
@@ -41,4 +60,8 @@ You can use a [Python environment](https://code.visualstudio.com/docs/python/env
 SHIFT-CMD-P
 ```
 
-to bring up a command search window. Now type `Python` or `Interpreter` or if you see it, select `Python: Select Interpreter`. Now choose the path to your conda environment. It will end with the name of the environment, such as 
+to bring up a command search window. Now type `Python` or `Interpreter` or if you see it, select `Python: Select Interpreter`. Now choose the path to your conda environment. It will include the name of the environment, such as:
+
+```bash
+Python 3.10.11 ('graphml') /opt/anaconda3/envs/graphml/bin/python
+```

@@ -1,5 +1,6 @@
 python-dateutil
 graphistry[ai]
+karateclub
 littleballoffur
 networkx
 numpy

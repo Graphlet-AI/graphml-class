@@ -7,7 +7,6 @@ networkx
 numpy
 pandas
 pyg-library
-pytorch-lightning
 requests
 seaborn
 torch

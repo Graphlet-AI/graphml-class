@@ -1,11 +1,13 @@
 python-dateutil
 graphistry[ai]
 karateclub
-littleballoffur
+-f git+git://github.com/benedekrozemberczki/littleballoffur.git
+networkit
 networkx
 numpy
 pandas
-pyg-lib
+pyg-library
+pytorch-lightning
 requests
 seaborn
 torch

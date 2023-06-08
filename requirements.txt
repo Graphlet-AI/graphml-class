@@ -1,7 +1,7 @@
 python-dateutil
 graphistry[ai]
 karateclub
--f git+git://github.com/benedekrozemberczki/littleballoffur.git
+-f https://github.com/benedekrozemberczki/littleballoffur.git
 networkit
 networkx
 numpy

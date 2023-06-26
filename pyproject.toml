@@ -8,10 +8,11 @@ readme = "README.md"
 packages = [{include = "graphml_class"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.9,<3.13"
 python-dateutil = "^2.8.2"
 graphistry = {extras = ["ai"], version = "^0.29.1"}
-networkx = "^3.1"
+littleballoffur = { git = "https://github.com/Graphlet-AI/littleballoffur.git", branch = "rjurney/unpin-get-nodes" }
+networkx = ">=3.1"
 numpy = "^1.24.3"
 pandas = "<2.0"
 requests = "^2.31.0"
@@ -23,7 +24,9 @@ torch-geometric = "^2.3.1"
 pyg-library = "^0.2.0"
 cmake = "^3.26.3"
 Cython = "^0.29.35"
-networkit = "^10.1"
+networkit = ">=10.1"
+llvmlite = "^0.40.0"
+numba = "^0.57.0"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

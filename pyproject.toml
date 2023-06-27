@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "graphml-class"
 version = "0.1.0"
-description = "Graphlet AI - Graph Machine Learning: Theory, Practice, Tools and Techniques"
+description = "Graphlet AI - Graph Machine Learning and Network Science: Theory, Practice, Tools and Techniques"
 authors = ["Russell Jurney <rjurney@graphlet.ai>"]
 license = "COMMERCIAL"
 readme = "README.md"

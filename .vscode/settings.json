@@ -1,0 +1,23 @@
+{
+    "editor.rulers": [
+        90,
+        120
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.python",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        },
+    },
+    "python.languageServer": "Pylance",
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black",
+    "isort.args": [
+        "--profile",
+        "black"
+    ],
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": true,
+    "autoDocstring.docstringFormat": "numpy",
+}

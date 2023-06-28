@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   jupyter:
+    # image: jupyter/scipy-notebook:python-3.10.11
     image: rjurney/graphml-class
     build:
       context: .

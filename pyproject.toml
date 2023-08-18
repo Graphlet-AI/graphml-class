@@ -40,8 +40,8 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
-target-version = ['py310']
-include = ['graphlet', 'test']
+target-version = ["py310"]
+include = ["graphlet", "test"]
 
 [tool.isort]
 profile = "black"

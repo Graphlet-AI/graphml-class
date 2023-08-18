@@ -37,3 +37,20 @@ isort = "^5.12.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
+target-version = ['py310']
+include = ['graphlet', 'tests']
+
+[tool.isort]
+profile = "black"
+src_paths = ["graphlet", "tests"]
+
+[tool.mypy]
+python_version = "3.10"
+mypy_path = ["graphlet", "tests"]
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = true

@@ -2,3 +2,5 @@
 .env
 data
 .DS_Store
+logs/neo4j
+logs

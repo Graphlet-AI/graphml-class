@@ -28,6 +28,7 @@ networkit = ">=10.1"
 llvmlite = "^0.40.0"
 numba = "^0.57.0"
 wandb = "^0.15.10"
+graphdatascience = "^1.7"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

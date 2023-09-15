@@ -865,6 +865,31 @@ files = [
 gitdb = ">=4.0.1,<5"
 
 [[package]]
+name = "graphdatascience"
+version = "1.7"
+description = "A Python client for the Neo4j Graph Data Science (GDS) library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "graphdatascience-1.7-py3-none-any.whl", hash = "sha256:bfda0823452974a705374bdaaa6d6819e3adf89ee5abec44e4137d211e8c10b3"},
+    {file = "graphdatascience-1.7.tar.gz", hash = "sha256:5e877c5a601c1790ea97aaf03dee7f82c07966bc8a69e7ce86ea0686a90508d2"},
+]
+
+[package.dependencies]
+multimethod = ">=1.0,<2.0"
+neo4j = ">=4.4.2,<6.0"
+pandas = ">=1.0,<3.0"
+pyarrow = ">=4.0,<13.0"
+textdistance = ">=4.0,<5.0"
+tqdm = ">=4.0,<5.0"
+typing-extensions = ">=4.0,<5.0"
+
+[package.extras]
+networkx = ["networkx (>=2.0,<4.0)"]
+ogb = ["ogb (>=1.0,<2.0)"]
+
+[[package]]
 name = "graphistry"
 version = "0.29.1"
 description = "A visual graph analytics library for extracting, transforming, displaying, and sharing big graphs with end-to-end GPU acceleration"
@@ -1560,6 +1585,18 @@ files = [
 ]
 
 [[package]]
+name = "multimethod"
+version = "1.9.1"
+description = "Multiple argument dispatching."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "multimethod-1.9.1-py3-none-any.whl", hash = "sha256:52f8f1f2b9d5a4c7adfdcc114dbeeebe3245a4420801e8807e26522a79fb6bc2"},
+    {file = "multimethod-1.9.1.tar.gz", hash = "sha256:1589bf52ca294667fd15527ea830127c763f5bfc38562e3642591ffd0fd9d56f"},
+]
+
+[[package]]
 name = "mypy-extensions"
 version = "1.0.0"
 description = "Type system extensions for programs checked with the mypy type checker."
@@ -1681,6 +1718,24 @@ traitlets = ">=5.1"
 [package.extras]
 docs = ["myst-parser", "pydata-sphinx-theme", "sphinx", "sphinxcontrib-github-alt", "sphinxcontrib-spelling"]
 test = ["pep440", "pre-commit", "pytest", "testpath"]
+
+[[package]]
+name = "neo4j"
+version = "5.12.0"
+description = "Neo4j Bolt driver for Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "neo4j-5.12.0.tar.gz", hash = "sha256:00a776a687267150f9e1950017316b751cf63db7b734a699b1405ac20fd4a731"},
+]
+
+[package.dependencies]
+pytz = "*"
+
+[package.extras]
+numpy = ["numpy (>=1.7.0,<2.0.0)"]
+pandas = ["numpy (>=1.7.0,<2.0.0)", "pandas (>=1.1.0,<3.0.0)"]
 
 [[package]]
 name = "networkit"
@@ -3283,6 +3338,33 @@ docs = ["myst-parser", "pydata-sphinx-theme", "sphinx"]
 test = ["pre-commit", "pytest (>=7.0)", "pytest-timeout"]
 
 [[package]]
+name = "textdistance"
+version = "4.5.0"
+description = "Compute distance between the two texts."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "textdistance-4.5.0-py3-none-any.whl", hash = "sha256:940f941282a773adb9ca9fd5cfd493cb2390f42b315708600315271d3c626a78"},
+    {file = "textdistance-4.5.0.tar.gz", hash = "sha256:364d43f4f6635742662e3e6cf5372a86859416c84a3c9b2ef9d66d44f5a4385c"},
+]
+
+[package.extras]
+all = ["abydos", "distance", "jellyfish", "numpy", "py-stringmatching", "pylev", "python-Levenshtein", "pyxDamerauLevenshtein", "rapidfuzz (>=2.6.0)", "tabulate"]
+benchmark = ["abydos", "distance", "jellyfish", "numpy", "py-stringmatching", "pylev", "python-Levenshtein", "pyxDamerauLevenshtein", "rapidfuzz (>=2.6.0)", "tabulate"]
+benchmarks = ["abydos", "distance", "jellyfish", "numpy", "py-stringmatching", "pylev", "python-Levenshtein", "pyxDamerauLevenshtein", "rapidfuzz (>=2.6.0)", "tabulate"]
+common = ["abydos", "jellyfish", "numpy", "python-Levenshtein", "pyxDamerauLevenshtein", "rapidfuzz (>=2.6.0)"]
+dameraulevenshtein = ["jellyfish", "pyxDamerauLevenshtein", "rapidfuzz (>=2.6.0)"]
+extra = ["abydos", "jellyfish", "numpy", "python-Levenshtein", "pyxDamerauLevenshtein", "rapidfuzz (>=2.6.0)"]
+extras = ["abydos", "jellyfish", "numpy", "python-Levenshtein", "pyxDamerauLevenshtein", "rapidfuzz (>=2.6.0)"]
+hamming = ["abydos", "distance", "jellyfish", "python-Levenshtein", "rapidfuzz (>=2.6.0)"]
+jaro = ["python-Levenshtein", "rapidfuzz (>=2.6.0)"]
+jarowinkler = ["jellyfish", "rapidfuzz (>=2.6.0)"]
+levenshtein = ["python-Levenshtein", "rapidfuzz (>=2.6.0)"]
+lint = ["flake8", "flake8-blind-except", "flake8-bugbear", "flake8-commas", "flake8-logging-format", "flake8-mutable", "flake8-pep3101", "flake8-quotes", "flake8-string-format", "flake8-tidy-imports", "isort", "mypy", "pep8-naming", "twine", "types-tabulate"]
+test = ["hypothesis", "isort", "numpy", "pytest"]
+
+[[package]]
 name = "threadpoolctl"
 version = "3.1.0"
 description = "threadpoolctl"
@@ -3790,4 +3872,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "01d74112ffefd6bc4988164b52d7fe5aa9670460846440b60d6ae32672d643d5"
+content-hash = "b882d7c31bd49195a9ab18607d47c8392025473cee97690e5f48c7baea1485f9"

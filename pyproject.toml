@@ -17,9 +17,11 @@ numpy = "^1.24.3"
 pandas = "<2.0"
 requests = "^2.31.0"
 seaborn = "^0.12.2"
-torch = {"url" = "https://files.pythonhosted.org/packages/81/58/431fd405855553af1a98091848cf97741302416b01462bbf9909d3c422b3/torch-1.13.1-cp310-cp310-manylinux1_x86_64.whl" }
-# torch = {"url" = "https://files.pythonhosted.org/packages/82/d8/0547f8a22a0c8aeb7e7e5e321892f1dcf93ea021829a99f1a25f1f535871/torch-1.13.1-cp310-none-macosx_10_9_x86_64.whl" }
-# torch = {"url" = "https://files.pythonhosted.org/packages/24/45/61e41ef8a84e1d6200ff10b7cb87e23e211599ab62420396a363295f973c/torch-1.13.1-cp310-none-macosx_11_0_arm64.whl" }
+torch = [
+    {"platform" = "linux", "url" = "https://files.pythonhosted.org/packages/81/58/431fd405855553af1a98091848cf97741302416b01462bbf9909d3c422b3/torch-1.13.1-cp310-cp310-manylinux1_x86_64.whl" },
+    {"platform" = "darwin", "url" = "https://files.pythonhosted.org/packages/82/d8/0547f8a22a0c8aeb7e7e5e321892f1dcf93ea021829a99f1a25f1f535871/torch-1.13.1-cp310-none-macosx_10_9_x86_64.whl" },
+# {"platform" = "darwin", "url" = "https://files.pythonhosted.org/packages/24/45/61e41ef8a84e1d6200ff10b7cb87e23e211599ab62420396a363295f973c/torch-1.13.1-cp310-none-macosx_11_0_arm64.whl" },
+]
 torch-geometric = "^2.3.1"
 pyg-library = "^0.2.0"
 cmake = "^3.26.3"
@@ -36,6 +38,8 @@ nbdime = "^3.2.1"
 black = "^23.3.0"
 flake8 = "^6.0.0"
 isort = "^5.12.0"
+pytest = "^7.4.2"
+pytest-stub = "^1.1.0"
 
 [build-system]
 requires = ["poetry-core"]

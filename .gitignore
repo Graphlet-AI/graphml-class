@@ -4,3 +4,4 @@ data
 .DS_Store
 logs/neo4j
 logs
+__pycache__

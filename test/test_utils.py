@@ -1,10 +1,9 @@
 import typing
 
+from graphml_class.utils import embed_paper_info, extract_paper_info
 from pytest import fixture
 from sklearn.metrics.pairwise import cosine_similarity
 from torch import Tensor
-
-from graphml_class.utils import embed_paper_info, extract_paper_info
 
 print("I take a moment to download the model for encoding sentences the first time I run...")
 

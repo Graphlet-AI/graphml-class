@@ -8,8 +8,7 @@
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": true
-        },
-        ""
+        }
     },
     "python.languageServer": "Pylance",
     "isort.args": [

@@ -1,6 +1,6 @@
 [flake8]
 min_python_version = 3.9.0
-max-line-length = 120
+max-line-length = 100
 ignore =
     # Whitespace before ':' (E203)
     E203

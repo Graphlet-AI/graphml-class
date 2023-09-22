@@ -1,10 +1,12 @@
-import timeit
 import typing
 
-import numpy as np
-from graphml_class.utils import embed_paper_info, extract_paper_info
 from pytest import fixture
 from sklearn.metrics.pairwise import cosine_similarity
+from torch import Tensor
+
+from graphml_class.utils import embed_paper_info, extract_paper_info
+
+print("I take a moment to download the model for encoding sentences the first time I run...")
 
 
 @fixture
@@ -85,8 +87,10 @@ def test_embed_paper_info(get_docs: typing.List[str]) -> None:
     get_docs : typing.List[str]
         fixture containing two paper documents
     """
-    emb_docs = embed_paper_info(get_docs)
+    emb_docs = embed_paper_info(get_docs, convert_to_tensor=False)
     assert emb_docs.shape == (2, 384)
     assert (
         cosine_similarity(emb_docs[0].reshape(1, -1), emb_docs[1].reshape(1, -1))[0, 0] - 0.7496432
     ) < 0.0001
+    emb_docs = embed_paper_info(get_docs, convert_to_tensor=True)
+    assert isinstance(emb_docs, Tensor)

@@ -10,6 +10,7 @@ import numpy as np
 import requests
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+from torch import Tensor
 
 model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
 
@@ -79,10 +80,12 @@ def extract_paper_info(record):
     return info
 
 
-def embed_paper_info(records: typing.Union[str, typing.List[str]]) -> np.ndarray:
+def embed_paper_info(
+    records: typing.Union[str, typing.List[str]], convert_to_tensor=True
+) -> typing.Union[np.ndarray, Tensor]:
     if records and isinstance(records, str):
         records = [records]
-    return model.encode(records)
+    return model.encode(records, convert_to_tensor=convert_to_tensor)
 
 
 def compare_paper_embeddings(X, Y):

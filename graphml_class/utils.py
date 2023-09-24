@@ -1,17 +1,17 @@
 import calendar
 import gzip
 import io
+import json
+import os
 import re
 import tarfile
-import typing
 from datetime import date
-from typing import Dict
+from typing import Dict, List, Union
 
 import networkx as nx
 import numpy as np
 import requests
 from sentence_transformers import SentenceTransformer
-from sklearn.metrics.pairwise import cosine_similarity
 from torch import Tensor
 
 model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
@@ -42,7 +42,7 @@ def extract_paper_info(record):
         info["From"] = from_match.group(1).strip()
 
     # Match "Date" field
-    date_match = re.search(r"Date:\s*(.*)", record)
+    date_match = re.search(r"Date:\s*(.*)(\s*)(\(\d+kb\))", record)
     if date_match:
         info["Date"] = date_match.group(1)
 
@@ -83,15 +83,11 @@ def extract_paper_info(record):
 
 
 def embed_paper_info(
-    records: typing.Union[str, typing.List[str]], convert_to_tensor=True
-) -> typing.Union[np.ndarray, Tensor]:
+    records: Union[str, List[str]], convert_to_tensor=True
+) -> Union[np.ndarray, Tensor]:
     if records and isinstance(records, str):
         records = [records]
     return model.encode(records, convert_to_tensor=convert_to_tensor)
-
-
-def compare_paper_embeddings(X, Y):
-    return cosine_similarity(X, Y)
 
 
 def main():
@@ -100,18 +96,25 @@ def main():
     G = nx.DiGraph()
 
     # Download and load edges (citations) from `cit-HepTh.txt.gz`
-    print("Fetching citation graph ...")
-    response = requests.get("https://snap.stanford.edu/data/cit-HepTh.txt.gz")
-    gzip_content = io.BytesIO(response.content)
+    edge_path = "data/cit-HepTh.txt.gz"
+    gzip_content = None
 
-    print("Writing edge list to file ...")
-    with open("data/cit-HepTh.txt.gz", "wb") as f:
-        f.write(response.content)
-        print("Wrote downloaded edge file to data/cit-HepTh.txt.gz")
+    if os.path.exists(edge_path):
+        print(f"Using existing citation graph edge file {edge_path}")
+        gzip_content = open(edge_path, "rb")
+    else:
+        print("Fetching citation graph edge file ...")
+        response = requests.get(f"https://snap.stanford.edu/{edge_path}")
+        gzip_content = io.BytesIO(response.content)
+
+        print("Writing edge list to file {edge_path}")
+        with open(edge_path, "wb") as f:
+            f.write(response.content)
+            print(f"Wrote downloaded edge file to {edge_path}")
 
     # We need to create sequential IDs starting from 0 for littleballoffur and DGL
-    file_to_net: Dict[str, int] = {}
-    net_to_file: Dict[int, str] = {}
+    file_to_net: Dict[int, int] = {}
+    net_to_file: Dict[int, int] = {}
     current_idx = 0
 
     # Decompress the gzip content and build the edge list for our network
@@ -152,18 +155,31 @@ def main():
 
     # Download the abstracts from `cit-HepTh-abstracts.tar.gz`
     print("Fetching paper abstracts ...")
-    abstract_response = requests.get("https://snap.stanford.edu/data/cit-HepTh-abstracts.tar.gz")
-    abstract_gzip_content = io.BytesIO(abstract_response.content)
+    abstract_path = "data/cit-HepTh-abstracts.tar.gz"
+    abstract_gzip_content = None
 
-    with open("data/cit-HepTh-abstracts.tar.gz", "wb") as f:
-        f.write(abstract_response.content)
-        print("Wrote downloaded abstract file to data/cit-HepTh-abstracts.tar.gz")
+    if os.path.exists(abstract_path):
+        print(f"Using existing paper abstracts file {abstract_path}")
+        with open(abstract_path, "rb") as f:
+            abstract_gzip_content = io.BytesIO(f.read())
+    else:
+        print("Downloading paper abbstracts ...")
+        abstract_response = requests.get(f"https://snap.stanford.edu/{abstract_path}")
+        abstract_gzip_content = io.BytesIO(abstract_response.content)
+
+        print(f"Downloading abstract file to {abstract_path}")
+        with open(abstract_path, "wb") as f:
+            f.write(abstract_response.content)
+            print(f"Wrote downloaded abstract file to {abstract_path}")
 
     hit_count, miss_count = 0, 0
+    all_abstracts: List[str] = []
+    abstracts: Dict[int, str] = {}
+    paper_ids: List[int] = []
     # Decompress the gzip content, then work through the abstract files in the tarball
     with gzip.GzipFile(fileobj=abstract_gzip_content) as f:
         with tarfile.open(fileobj=f, mode="r|") as tar:
-            for file_number, member in enumerate(tar):
+            for member in tar:
                 abstract_file = tar.extractfile(member)
                 if abstract_file is not None:
                     content = abstract_file.read().decode("utf-8")
@@ -180,6 +196,11 @@ def main():
                         if paper_id in file_to_net and file_to_net[paper_id] in G:
                             for field, value in paper_info.items():
                                 G.nodes[file_to_net[paper_id]][field] = value
+
+                            abstracts[paper_id] = content
+                            all_abstracts.append(content)
+                            paper_ids.append(paper_id)
+
                             hit_count += 1
 
                         else:
@@ -191,12 +212,20 @@ def main():
     print(f"Added metadata to {hit_count:,} nodes, {miss_count:,} were unknown.")
 
     # Download and load edges (citations) from `cit-HepTh.txt.gz`
-    date_response = requests.get("https://snap.stanford.edu/data/cit-HepTh-dates.txt.gz")
-    date_gzip_content = io.BytesIO(date_response.content)
+    dates_path = "data/cit-HepTh-dates.txt.gz"
+    date_gzip_content = None
 
-    with open("data/cit-HepTh-dates.txt.gz", "wb") as f:
-        f.write(date_response.content)
-        print("Wrote downloaded publishing dates file to data/cit-HepTh-dates.txt.gz")
+    if os.path.exists(dates_path):
+        print(f"Using existing paper dates file {dates_path}")
+        date_gzip_content = open(dates_path, "rb")
+    else:
+        print("Downloading paper publishing dates ...")
+        date_response = requests.get(f"https://snap.stanford.edu/{dates_path}")
+        date_gzip_content = io.BytesIO(date_response.content)
+
+        with open(dates_path, "wb") as f:
+            f.write(date_response.content)
+            print("Wrote downloaded publishing dates file to {dates_path}")
 
     # Decompress the gzip content and add a "published" date property to our nodes
     print("Adding publising dates ...")
@@ -217,23 +246,38 @@ def main():
                     )
 
     # What is the first node?
-    test_g = G.nodes[0]
-    # print([G.nodes[i] for i in range(0, 10)])
-    print(test_g)
-    assert test_g["sequential_id"] == 0
-    assert test_g["file_id"] == 1001
+    test_node = G.nodes[0]
+    print(test_node)
+    assert test_node["sequential_id"] == 0
+    assert test_node["file_id"] == 1001
 
-    # # Now embed some of the node content
-    # abstracts = [node["Abstract"] for node in G.nodes()]
-    # for node in G.nodes():
+    # Embed the abstracts for GNN features. Embedding is a generic approach for retrieval as well.
+    # Note: NetworkX can't save lists in GEXF format, so we'll JSONize the list & save the embeddings separately.
+    embedded_abstracts: np.ndarray = None
+    if os.path.exists("data/embedded_abstracts.npy"):
+        embedded_abstracts = np.load("data/embedded_abstracts.npy")
+    else:
+        embedded_abstracts = embed_paper_info(all_abstracts, convert_to_tensor=False)
+        np.save("data/embedded_abstracts.npy", embedded_abstracts)
 
-    #     # Embedding is a generic approach with or without parsing.
-    #     content_embedding = embed_paper_info(content, convert_to_tensor=False)
-    #     G.nodes[file_to_net[paper_id]]["embedding"] = content_embedding[0]
+    node_embedding_dict: Dict[int : List[float]] = {}
+    if os.path.exists("data/node_embedding_dict.json"):
+        node_embedding_dict = json.load(open("data/node_embedding_dict.json", "r"))
+    else:
+        for paper_id, emb in zip(paper_ids, embedded_abstracts):
+            assert emb.shape == (384,)
 
-    #     paper_title = G.nodes[file_to_net[paper_id]]["Title"]
-    #     title_embedding = embed_paper_info(paper_title, convert_to_tensor=False)
-    #     G.nodes[file_to_net[paper_id]]["title_embedding"] = title_embedding[0]
+            # Gephi assumes a list of floats is a time series, so we need to convert to a string
+            emb_list = emb.tolist()
+            G.nodes[file_to_net[paper_id]]["Embedding-JSON"] = json.dumps(emb_list)
+
+            node_embedding_dict[paper_id] = emb_list
+
+    # Write the mapping from paper ID to embedding to JSON
+    json.dump(node_embedding_dict, open("data/node_embedding_dict.json", "w"))
+
+    # Write the entire network using GEXF format - the date has to be in UTC format for this to work.
+    nx.write_gexf(G, path="data/physics_embeddings.gexf", prettyprint=True)
 
 
 if __name__ == "__main__":

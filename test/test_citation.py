@@ -1,5 +1,6 @@
 import typing
 
+from dgl import DGLGraph
 from dgl.dataloading import GraphDataLoader
 from graphml_class.citation import CitationDataset, embed_paper_info, extract_paper_info
 from pytest import fixture
@@ -107,3 +108,5 @@ def test_citation_dgl_graph(get_docs: typing.List[str]) -> None:
     dataset = CitationDataset()
     dataloader = GraphDataLoader(dataset, batch_size=1, shuffle=True)
     g, labels = next(dataloader)
+    assert isinstance(g, DGLGraph)
+    assert isinstance(labels, Tensor)

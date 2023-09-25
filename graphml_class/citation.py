@@ -177,7 +177,7 @@ def main():
             f.write(abstract_response.content)
             print(f"Wrote downloaded abstract file to {abstract_path}")
 
-    hit_count, miss_count = 0, 0
+    hit_count, miss_count, matches = 0, 0, 0
     all_abstracts: List[str] = []
     abstracts: Dict[int, str] = {}
     paper_ids: List[int] = []
@@ -186,16 +186,18 @@ def main():
         with tarfile.open(fileobj=f, mode="r|") as tar:
             for member in tar:
                 abstract_file = tar.extractfile(member)
-                if abstract_file is not None:
+                if abstract_file:
                     content = abstract_file.read().decode("utf-8")
+
+                    paper_id = int(os.path.basename(member.name).split(".")[0])
 
                     # We can also parse and use those values directly or embed field-wise
                     paper_info = extract_paper_info(content)
                     if paper_info:
-                        paper_id = paper_info.get("Paper", "").split("/")[-1]
-
-                        # The edge list makes the paper ID an int, stripping 0001001 to 1001, for example
-                        paper_id = int(paper_id)
+                        abstract_paper_id = paper_info.get("Paper", "").split("/")[-1]
+                        if paper_id != int(abstract_paper_id):
+                            matches += 1
+                            print(f"Paper ID {paper_id} != {abstract_paper_id}")
 
                         # Get the paper ID part of the "Paper" field
                         if paper_id in file_to_net and file_to_net[paper_id] in G:
@@ -342,10 +344,41 @@ class CitationGraphDataset(DGLDataset):
         self.file_to_net: Dict[int, int] = {}
 
     def download(self):
-        """download _summary_"""
+        """download Download all three files: edges, abstracts, and publishing dates."""
+        self.file_paths = []
         for file_name in self.file_names:
             file_path = os.path.join(self.raw_dir, file_name)
+            self.file_paths.append(file_path)
             dgl_download(self.url + file_name, path=file_path)
+
+    def featurize(self) -> torch.Tensor:
+        """featurize Sentence encode abstracts into 384-dimension embeddings via paraphrase-MiniLM-L6-v2.
+
+        Returns
+        -------
+        torch.Tensor
+            (node_count,384) tensor of abstract embeddings
+        """
+        self.model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
+
+        hit_count = 0
+        abstracts_list: List[str] = []
+        abstracts: Dict[int, str] = {}
+
+        # Decompress the gzip content, then work through the abstract files in the tarball
+        with gzip.GzipFile(filename=self.file_paths[1]) as f:
+            with tarfile.open(fileobj=f, mode="r|") as tar:
+                for member in tar:
+                    paper_id = int(os.path.basename(member.name).split(".")[0])
+
+                    abstract_file = tar.extractfile(member)
+                    if abstract_file:
+                        content = abstract_file.read().decode("utf-8")
+                        abstracts_list.append(content)
+                        abstracts[paper_id] = content
+                        hit_count += 1
+
+        return embed_paper_info(abstracts_list, convert_to_tensor=True)
 
     def process(self):
         """process Build graph and node features from sbert on raw data."""
@@ -353,7 +386,7 @@ class CitationGraphDataset(DGLDataset):
         # Build the graph U/V edge Tensors
         u, v = [], []
         current_idx = 0
-        with gzip.GzipFile(fileobj=open(self.file_names[0], "wb")) as f:
+        with gzip.GzipFile(filename=self.file_paths[0]) as f:
             for line_number, line in enumerate(f):
                 line = line.decode("utf-8")
 
@@ -377,7 +410,9 @@ class CitationGraphDataset(DGLDataset):
                     u.append(self.file_to_net[citing_key])
                     v.append(self.file_to_net[cited_key])
 
+        # Build our DGLGraph from the edge list :)
         self._g = dgl.graph((torch.tensor(u), torch.tensor(v)))
+        self._g.ndata["x"] = self.featurize()
 
     def __getitem__(self, idx):
         assert idx == 0, "This dataset has only one graph"

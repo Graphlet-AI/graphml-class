@@ -371,7 +371,7 @@ class CitationGraphDataset(DGLDataset):
                     paper_id = int(os.path.basename(member.name).split(".")[0])
 
                     abstract_file = tar.extractfile(member)
-                    if abstract_file:
+                    if abstract_file and paper_id in file_to_net:
                         content = abstract_file.read().decode("utf-8")
                         abstracts[file_to_net[paper_id]] = content
 

@@ -8,6 +8,7 @@ import tarfile
 from datetime import date
 from typing import Dict, List, Union
 
+import dgl
 import networkx as nx
 import numpy as np
 import requests
@@ -291,8 +292,8 @@ def main():
     nx.write_gexf(G, path="data/physics_embeddings.gexf", prettyprint=True)
 
 
-class CitationDataset(DGLDataset):
-    """CitationDataset DGLDataset sub-class for loading our citation network dataset.
+class CitationGraphDataset(DGLDataset):
+    """CitationGraphDataset DGLDataset sub-class for loading our citation network dataset.
 
     Parameters
     ----------
@@ -320,7 +321,7 @@ class CitationDataset(DGLDataset):
         force_reload=False,
         verbose=False,
     ):
-        super(CitationDataset, self).__init__(
+        super(CitationGraphDataset, self).__init__(
             name="cit-HepTh",
             url=url,
             raw_dir=raw_dir,

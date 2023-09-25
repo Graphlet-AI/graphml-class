@@ -326,7 +326,7 @@ class CitationGraphDataset(DGLDataset):
         self,
         url="https://snap.stanford.edu/data/",
         raw_dir="data",
-        save_dir="data/cit-HepTh",
+        save_dir="data",
         force_reload=False,
         verbose=False,
     ):
@@ -339,22 +339,20 @@ class CitationGraphDataset(DGLDataset):
             verbose=verbose,
         )
         self.save_path = os.path.join(self.save_dir, f"{CitationGraphDataset.name}.bin")
-        self.file_names: List[str] = [
-            "cit-HepTh.txt.gz",
-            "cit-HepTh-abstracts.tar.gz",
-            "cit-HepTh-dates.txt.gz",
-        ]
         self.file_to_net: Dict[int, int] = {}
 
     def download(self):
         """download Download all three files: edges, abstracts, and publishing dates."""
-        self.file_paths = []
-        for file_name in self.file_names:
+        file_names: List[str] = [
+            "cit-HepTh.txt.gz",
+            "cit-HepTh-abstracts.tar.gz",
+            "cit-HepTh-dates.txt.gz",
+        ]
+        for file_name in file_names:
             file_path = os.path.join(self.raw_dir, file_name)
-            self.file_paths.append(file_path)
             dgl_download(self.url + file_name, path=file_path)
 
-    def featurize(self) -> torch.Tensor:
+    def load_abstracts(self) -> torch.Tensor:
         """featurize Sentence encode abstracts into 384-dimension embeddings via paraphrase-MiniLM-L6-v2.
 
         Returns
@@ -364,12 +362,11 @@ class CitationGraphDataset(DGLDataset):
         """
         self.model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
 
-        hit_count = 0
-        abstracts_list: List[str] = []
         abstracts: Dict[int, str] = {}
 
         # Decompress the gzip content, then work through the abstract files in the tarball
-        with gzip.GzipFile(filename=self.file_paths[1]) as f:
+        abstract_path = os.path.join(self.raw_dir, "cit-HepTh-abstracts.txt.gz")
+        with gzip.GzipFile(filename=abstract_path) as f:
             with tarfile.open(fileobj=f, mode="r|") as tar:
                 for member in tar:
                     paper_id = int(os.path.basename(member.name).split(".")[0])
@@ -377,11 +374,24 @@ class CitationGraphDataset(DGLDataset):
                     abstract_file = tar.extractfile(member)
                     if abstract_file:
                         content = abstract_file.read().decode("utf-8")
-                        abstracts_list.append(content)
-                        abstracts[paper_id] = content
-                        hit_count += 1
+                        abstracts[self.file_to_net[paper_id]] = content
 
-        return embed_paper_info(abstracts_list, convert_to_tensor=True)
+        # Embed all the abstracts at once
+        node_ids = list(abstracts.keys())
+        contents = list(abstracts.values())
+        all_embeddings = embed_paper_info(contents, convert_to_tensor=False)
+
+        # Determine the max node ID to ensure the embeddings tensor covers all nodes
+        max_node_id = max(abstracts.keys())
+
+        # Pre-allocate a tensor filled with zeros for all node embeddings
+        embeddings = np.zeros((max_node_id + 1, 384))
+
+        # Fill in the tensor with the embeddings at the corresponding node IDs
+        for idx, node_id in enumerate(node_ids):
+            embeddings[node_id] = all_embeddings[idx]
+
+        return torch.tensor(embeddings)
 
     def process(self):
         """process Build graph and node features from sbert on raw data."""
@@ -389,7 +399,8 @@ class CitationGraphDataset(DGLDataset):
         # Build the graph U/V edge Tensors
         u, v = [], []
         current_idx = 0
-        with gzip.GzipFile(filename=self.file_paths[0]) as f:
+        edge_path = os.path.join(self.raw_dir, "cit-HepTh.txt.gz")
+        with gzip.GzipFile(filename=edge_path) as f:
             for line_number, line in enumerate(f):
                 line = line.decode("utf-8")
 

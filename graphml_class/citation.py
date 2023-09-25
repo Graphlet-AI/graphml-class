@@ -49,7 +49,7 @@ def extract_paper_info(record):
     # Match "Date" field
     date_match = re.search(r"Date:\s*(.*)(\s*)(\(\d+kb\))", record)
     if date_match:
-        info["Date"] = date_match.group(1)
+        info["Date"] = date_match.group(1).strip()
 
     # Match "Title" field
     title_match = re.search(r"Title:\s*(.*)", record)
@@ -268,8 +268,11 @@ def main():
         np.save("data/embedded_abstracts.npy", embedded_abstracts)
 
     node_embedding_dict: Dict[int, List[float]] = {}
-    if os.path.exists("data/node_embedding_dict.json"):
-        node_embedding_dict = json.load(open("data/node_embedding_dict.json", "r"))
+    if os.path.exists("data/node_embedding_dict.json.gz"):
+        node_embedding_dict = json.load(
+            gzip.GzipFile("data/node_embedding_dict.json.gz", "r"),
+            encoding="utf-8",
+        )
     else:
         for paper_id, emb in zip(paper_ids, embedded_abstracts):
             assert emb.shape == (384,)

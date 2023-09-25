@@ -339,7 +339,6 @@ class CitationGraphDataset(DGLDataset):
             verbose=verbose,
         )
         self.save_path = os.path.join(self.save_dir, f"{CitationGraphDataset.name}.bin")
-        self.file_to_net: Dict[int, int] = {}
 
     def download(self):
         """download Download all three files: edges, abstracts, and publishing dates."""
@@ -352,7 +351,7 @@ class CitationGraphDataset(DGLDataset):
             file_path = os.path.join(self.raw_dir, file_name)
             dgl_download(self.url + file_name, path=file_path)
 
-    def load_abstracts(self) -> torch.Tensor:
+    def featurize(self, file_to_net: Dict[int, int]) -> torch.Tensor:
         """featurize Sentence encode abstracts into 384-dimension embeddings via paraphrase-MiniLM-L6-v2.
 
         Returns
@@ -365,7 +364,7 @@ class CitationGraphDataset(DGLDataset):
         abstracts: Dict[int, str] = {}
 
         # Decompress the gzip content, then work through the abstract files in the tarball
-        abstract_path = os.path.join(self.raw_dir, "cit-HepTh-abstracts.txt.gz")
+        abstract_path = os.path.join(self.raw_dir, "cit-HepTh-abstracts.tar.gz")
         with gzip.GzipFile(filename=abstract_path) as f:
             with tarfile.open(fileobj=f, mode="r|") as tar:
                 for member in tar:
@@ -374,7 +373,7 @@ class CitationGraphDataset(DGLDataset):
                     abstract_file = tar.extractfile(member)
                     if abstract_file:
                         content = abstract_file.read().decode("utf-8")
-                        abstracts[self.file_to_net[paper_id]] = content
+                        abstracts[file_to_net[paper_id]] = content
 
         # Embed all the abstracts at once
         node_ids = list(abstracts.keys())
@@ -400,6 +399,7 @@ class CitationGraphDataset(DGLDataset):
         u, v = [], []
         current_idx = 0
         edge_path = os.path.join(self.raw_dir, "cit-HepTh.txt.gz")
+        file_to_net: Dict[int, int] = {}
         with gzip.GzipFile(filename=edge_path) as f:
             for line_number, line in enumerate(f):
                 line = line.decode("utf-8")
@@ -414,19 +414,19 @@ class CitationGraphDataset(DGLDataset):
 
                     # If the either of the paper IDs don't exist, make one
                     for key in [citing_key, cited_key]:
-                        if key not in self.file_to_net:
+                        if key not in file_to_net:
                             # Build up an index that maps back and forth
-                            self.file_to_net[key] = current_idx
+                            file_to_net[key] = current_idx
 
                             # Bump the current ID
                             current_idx += 1
 
-                    u.append(self.file_to_net[citing_key])
-                    v.append(self.file_to_net[cited_key])
+                    u.append(file_to_net[citing_key])
+                    v.append(file_to_net[cited_key])
 
         # Build our DGLGraph from the edge list :)
         self._g = dgl.graph((torch.tensor(u), torch.tensor(v)))
-        self._g.ndata["x"] = self.featurize()
+        self._g.ndata["x"] = self.featurize(file_to_net)
 
     def __getitem__(self, idx):
         assert idx == 0, "This dataset has only one graph"

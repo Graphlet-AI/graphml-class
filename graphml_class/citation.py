@@ -12,8 +12,10 @@ import dgl
 import networkx as nx
 import numpy as np
 import requests
+import torch
 from dgl.data import DGLDataset
 from dgl.data.utils import download as dgl_download
+from dgl.data.utils import load_graphs, save_graphs
 from sentence_transformers import SentenceTransformer
 from torch import Tensor
 
@@ -313,27 +315,31 @@ class CitationGraphDataset(DGLDataset):
         Whether to print out progress information
     """
 
+    name = "cit-HepTh"
+
     def __init__(
         self,
         url="https://snap.stanford.edu/data/",
         raw_dir="data",
-        save_dir="data",
+        save_dir="data/cit-HepTh",
         force_reload=False,
         verbose=False,
     ):
         super(CitationGraphDataset, self).__init__(
-            name="cit-HepTh",
+            name=CitationGraphDataset.name,
             url=url,
             raw_dir=raw_dir,
             save_dir=save_dir,
             force_reload=force_reload,
             verbose=verbose,
         )
-        self.file_names = (
+        self.save_path = os.path.join(self.save_dir, f"{CitationGraphDataset.name}.bin")
+        self.file_names: List[str] = [
             "cit-HepTh.txt.gz",
             "cit-HepTh-abstracts.tar.gz",
             "cit-HepTh-dates.txt.gz",
-        )
+        ]
+        self.file_to_net: Dict[int, int] = {}
 
     def download(self):
         """download _summary_"""
@@ -343,7 +349,35 @@ class CitationGraphDataset(DGLDataset):
 
     def process(self):
         """process Build graph and node features from sbert on raw data."""
-        pass
+
+        # Build the graph U/V edge Tensors
+        u, v = [], []
+        current_idx = 0
+        with gzip.GzipFile(fileobj=open(self.file_names[0], "wb")) as f:
+            for line_number, line in enumerate(f):
+                line = line.decode("utf-8")
+
+                # Ignore comment lines that start with '#'
+                if not line.startswith("#"):
+                    # Source (citing), desstination (cited) papers
+                    citing_key, cited_key = line.strip().split("\t")
+
+                    # The edge list makes the paper ID an int, stripping 0001001 to 1001, for example
+                    citing_key, cited_key = int(citing_key), int(cited_key)
+
+                    # If the either of the paper IDs don't exist, make one
+                    for key in [citing_key, cited_key]:
+                        if key not in self.file_to_net:
+                            # Build up an index that maps back and forth
+                            self.file_to_net[key] = current_idx
+
+                            # Bump the current ID
+                            current_idx += 1
+
+                    u.append(self.file_to_net[citing_key])
+                    v.append(self.file_to_net[cited_key])
+
+        self._g = dgl.graph((torch.tensor(u), torch.tensor(v)))
 
     def __getitem__(self, idx):
         assert idx == 0, "This dataset has only one graph"
@@ -354,19 +388,16 @@ class CitationGraphDataset(DGLDataset):
         return 1
 
     def save(self):
-        """save Save processed data to directory `self.save_path`"""
-        pass
+        """save Save our one graph to directory `self.save_path`"""
+        save_graphs(self.save_path, [self._g])
 
     def load(self):
         """load Load processed data from directory `self.save_path`"""
-        pass
+        self._g = load_graphs(self.save_path)[0]
 
     def has_cache(self):
         """has_cache Check whether there are processed data in `self.save_path`"""
-        # for file_name in self.file_names:
-        #     if not os.path.exists(os.path.join(self.save_path, file_name)):
-        #         return False
-        return True
+        return os.path.exists(self.save_path)
 
 
 if __name__ == "__main__":

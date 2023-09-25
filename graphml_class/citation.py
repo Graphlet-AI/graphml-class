@@ -11,6 +11,8 @@ from typing import Dict, List, Union
 import networkx as nx
 import numpy as np
 import requests
+from dgl.data import DGLDataset
+from dgl.data.utils import download as dgl_download
 from sentence_transformers import SentenceTransformer
 from torch import Tensor
 
@@ -260,7 +262,7 @@ def main():
         embedded_abstracts = embed_paper_info(all_abstracts, convert_to_tensor=False)
         np.save("data/embedded_abstracts.npy", embedded_abstracts)
 
-    node_embedding_dict: Dict[int : List[float]] = {}
+    node_embedding_dict: Dict[int, List[float]] = {}
     if os.path.exists("data/node_embedding_dict.json"):
         node_embedding_dict = json.load(open("data/node_embedding_dict.json", "r"))
     else:
@@ -273,11 +275,97 @@ def main():
 
             node_embedding_dict[paper_id] = emb_list
 
-    # Write the mapping from paper ID to embedding to JSON
-    json.dump(node_embedding_dict, open("data/node_embedding_dict.json", "w"))
+    # Write the mapping from paper ID to embedding to JSON.
+    # Note: All JSON keys are strings. We will have to int(key) to read the data back.
+    json.dump(
+        node_embedding_dict,
+        io.TextIOWrapper(
+            gzip.GzipFile("data/node_embedding_dict.json.gz", "w"),
+            encoding="utf-8",
+        ),
+        indent=4,
+        sort_keys=True,
+    )
 
     # Write the entire network using GEXF format - the date has to be in UTC format for this to work.
     nx.write_gexf(G, path="data/physics_embeddings.gexf", prettyprint=True)
+
+
+class CitationDataset(DGLDataset):
+    """CitationDataset DGLDataset sub-class for loading our citation network dataset.
+
+    Parameters
+    ----------
+    url : str
+        URL of the base path at SNAP from which to download the raw dataset(s)
+    raw_dir : str
+        Specifying the directory that will store the
+        downloaded data or the directory that
+        already stores the input data.
+        Default: ~/.dgl/
+    save_dir : str
+        Directory to save the processed dataset.
+        Default: the value of `raw_dir`
+    force_reload : bool
+        Whether to reload the dataset. Default: False
+    verbose : bool
+        Whether to print out progress information
+    """
+
+    def __init__(
+        self,
+        url="https://snap.stanford.edu/data/",
+        raw_dir="data",
+        save_dir="data",
+        force_reload=False,
+        verbose=False,
+    ):
+        super(CitationDataset, self).__init__(
+            name="cit-HepTh",
+            url=url,
+            raw_dir=raw_dir,
+            save_dir=save_dir,
+            force_reload=force_reload,
+            verbose=verbose,
+        )
+        self.file_names = (
+            "cit-HepTh.txt.gz",
+            "cit-HepTh-abstracts.tar.gz",
+            "cit-HepTh-dates.txt.gz",
+        )
+
+    def download(self):
+        """download _summary_"""
+        for file_name in self.file_names:
+            file_path = os.path.join(self.raw_dir, file_name)
+            dgl_download(self.url + file_name, path=file_path)
+
+    def process(self):
+        """process Build graph and node features from sbert on raw data."""
+        pass
+
+    def __getitem__(self, idx):
+        assert idx == 0, "This dataset has only one graph"
+        return self._g
+
+    def __len__(self):
+        """__len__ we are one graph long"""
+        return 1
+
+    def save(self):
+        """save Save processed data to directory `self.save_path`"""
+        pass
+
+    def load(self):
+        """load Load processed data from directory `self.save_path`"""
+        pass
+
+    def has_cache(self):
+        """has_cache Check whether there are processed data in `self.save_path`"""
+        for file_name in self.file_names:
+            if not os.path.exists(os.path.join(self.save_path, file_name)):
+                return False
+        return True
 
 
 if __name__ == "__main__":

@@ -2,7 +2,11 @@ import typing
 
 from dgl import DGLGraph
 from dgl.dataloading import GraphDataLoader
-from graphml_class.citation import CitationDataset, embed_paper_info, extract_paper_info
+from graphml_class.citation import (
+    CitationGraphDataset,
+    embed_paper_info,
+    extract_paper_info,
+)
 from pytest import fixture
 from sklearn.metrics.pairwise import cosine_similarity
 from torch import Tensor
@@ -105,7 +109,7 @@ def test_citation_dgl_graph(get_docs: typing.List[str]) -> None:
     get_docs : typing.List[str]
         _description_
     """
-    dataset = CitationDataset()
+    dataset = CitationGraphDataset()
     dataloader = GraphDataLoader(dataset, batch_size=1, shuffle=True)
     g, labels = next(dataloader)
     assert isinstance(g, DGLGraph)

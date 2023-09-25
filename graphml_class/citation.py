@@ -363,9 +363,9 @@ class CitationGraphDataset(DGLDataset):
 
     def has_cache(self):
         """has_cache Check whether there are processed data in `self.save_path`"""
-        for file_name in self.file_names:
-            if not os.path.exists(os.path.join(self.save_path, file_name)):
-                return False
+        # for file_name in self.file_names:
+        #     if not os.path.exists(os.path.join(self.save_path, file_name)):
+        #         return False
         return True
 
 

@@ -1,6 +1,7 @@
 import typing
 
-from graphml_class.utils import embed_paper_info, extract_paper_info
+from dgl.dataloading import GraphDataLoader
+from graphml_class.citation import CitationDataset, embed_paper_info, extract_paper_info
 from pytest import fixture
 from sklearn.metrics.pairwise import cosine_similarity
 from torch import Tensor
@@ -93,3 +94,16 @@ def test_embed_paper_info(get_docs: typing.List[str]) -> None:
     ) < 0.0001
     emb_docs = embed_paper_info(get_docs, convert_to_tensor=True)
     assert isinstance(emb_docs, Tensor)
+
+
+def test_citation_dgl_graph(get_docs: typing.List[str]) -> None:
+    """test_citation_dgl_graph Test instantiating our CitationDGLGraph class.
+
+    Parameters
+    ----------
+    get_docs : typing.List[str]
+        _description_
+    """
+    dataset = CitationDataset()
+    dataloader = GraphDataLoader(dataset, batch_size=1, shuffle=True)
+    g, labels = next(dataloader)

@@ -19,6 +19,7 @@ services:
       - envs/graphistry.env
       - envs/search.env
       - envs/openai.env
+      - envs/wandb.env
       - .env
     restart: always
   neo4j:

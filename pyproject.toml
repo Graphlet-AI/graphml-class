@@ -7,6 +7,13 @@ license = "COMMERCIAL"
 readme = "README.md"
 packages = [{include = "graphml_class"}]
 
+[project.urls]
+"Company Homepage" = "https://graphlet.ai"
+"Class Homepage" = "https://technologytransfer.it/events-mec/graph-machine-learning-2/"
+"Teacher Homepage" = "https://linkedin.com/in/russelljurney"
+"Code Repository" = "https://github.com/Graphlet-AI/graphml-class"
+"Bug Tracker" = "https://github.com/Graphlet-AI/graphml-class/issues"
+
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 python-dateutil = "^2.8.2"

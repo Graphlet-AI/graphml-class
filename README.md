@@ -1,6 +1,8 @@
 # Graph Machine Learning: Theory, Practice, Tools and Techniques
 
-This is a course from Graphlet AI taught by Russell Jurney.
+This is a course from Graphlet AI on full-stack graph machine learning taught by Russell Jurney.
+
+<center><img src="images/Graphlet-AI-Banner-with-Hypergraph-and-Womans-Head.jpg" /></center>
 
 ## Environment Setup
 

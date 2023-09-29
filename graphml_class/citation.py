@@ -271,7 +271,7 @@ def main():
     if os.path.exists("data/node_embedding_dict.json.gz"):
         node_embedding_dict = json.load(
             gzip.GzipFile("data/node_embedding_dict.json.gz", "r"),
-            encoding="utf-8",
+            # encoding="utf-8",
         )
     else:
         for paper_id, emb in zip(paper_ids, embedded_abstracts):
@@ -330,6 +330,7 @@ class CitationGraphDataset(DGLDataset):
         force_reload=False,
         verbose=False,
     ):
+        self._save_path = os.path.join(save_dir, f"{CitationGraphDataset.name}.bin")
         super(CitationGraphDataset, self).__init__(
             name=CitationGraphDataset.name,
             url=url,
@@ -338,7 +339,6 @@ class CitationGraphDataset(DGLDataset):
             force_reload=force_reload,
             verbose=verbose,
         )
-        self.save_path = os.path.join(self.save_dir, f"{CitationGraphDataset.name}.bin")
 
     def download(self):
         """download Download all three files: edges, abstracts, and publishing dates."""
@@ -438,15 +438,15 @@ class CitationGraphDataset(DGLDataset):
 
     def save(self):
         """save Save our one graph to directory `self.save_path`"""
-        save_graphs(self.save_path, [self._g])
+        save_graphs(self._save_path, [self._g])
 
     def load(self):
         """load Load processed data from directory `self.save_path`"""
-        self._g = load_graphs(self.save_path)[0]
+        self._g = load_graphs(self._save_path)[0]
 
     def has_cache(self):
         """has_cache Check whether there are processed data in `self.save_path`"""
-        return os.path.exists(self.save_path)
+        return os.path.exists(self._save_path)
 
 
 if __name__ == "__main__":

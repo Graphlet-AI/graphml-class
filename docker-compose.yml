@@ -23,7 +23,7 @@ services:
       - .env
     restart: always
   neo4j:
-    image: neo4j:5.11.0
+    image: neo4j:5.12.0
     container_name: neo4j
     ports:
       - 7474:7474

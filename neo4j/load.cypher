@@ -4,7 +4,7 @@ CREATE CONSTRAINT email_id IF NOT EXISTS FOR(n:email) REQUIRE (n.id) IS UNIQUE;
 CREATE CONSTRAINT phone_id IF NOT EXISTS FOR(n:phone) REQUIRE (n.id) IS UNIQUE;
 CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) IS UNIQUE;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_name.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_name.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:name { id: row.id })
@@ -12,7 +12,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_identifier.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_identifier.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:identifier { id: row.id })
@@ -20,7 +20,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Person.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Person.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -51,7 +51,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Person:LegalEntity
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_LegalEntity.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_LegalEntity.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -80,7 +80,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:LegalEntity
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Oligarch.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Oligarch.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -88,7 +88,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Oligarch
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Sanction.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Sanction.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -107,7 +107,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Sanction
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_DebarredEntity.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_DebarredEntity.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -115,7 +115,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:DebarredEntity
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Address.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Address.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -133,7 +133,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Address
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Passport.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Passport.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -152,7 +152,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Passport:Identification
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Identification.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Identification.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -168,7 +168,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Identification
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_SanctionedEntity.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_SanctionedEntity.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -176,7 +176,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:SanctionedEntity
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Organization.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Organization.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -205,7 +205,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Organization:LegalEntity
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Terrorism.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Terrorism.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -213,7 +213,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Terrorism
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Company.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Company.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -247,7 +247,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Company:Organization:Asset:LegalEntity
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_email.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_email.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:email { id: row.id })
@@ -255,7 +255,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_phone.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_phone.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:phone { id: row.id })
@@ -263,7 +263,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_PublicBody.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_PublicBody.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -292,7 +292,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:PublicBody:Organization:LegalEntity
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Politician.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Politician.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -300,7 +300,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Politician
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Crime.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Crime.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -308,7 +308,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Crime
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Vessel.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Vessel.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -331,7 +331,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Vessel:Vehicle:Asset
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Offshore.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Offshore.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -339,7 +339,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Offshore
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Security.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Security.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -358,7 +358,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Security:Asset
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_BankAccount.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_BankAccount.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -376,7 +376,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:BankAccount:Asset
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_CryptoWallet.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_CryptoWallet.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -393,7 +393,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:CryptoWallet
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_StatwnedEnterprise.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_StatwnedEnterprise.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -401,7 +401,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:StatwnedEnterprise
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Airplane.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Airplane.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -421,7 +421,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Airplane:Vehicle:Asset
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_CloseAssociate.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_CloseAssociate.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -429,7 +429,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:CloseAssociate
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_FinancialCrime.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_FinancialCrime.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -437,7 +437,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:FinancialCrime
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Bank.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Bank.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -445,7 +445,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Bank
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Fraud.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Fraud.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -453,7 +453,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Fraud
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Diplomat.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Diplomat.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -461,7 +461,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Diplomat
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Judge.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Judge.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -469,7 +469,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Judge
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_WarCrimes.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_WarCrimes.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -477,7 +477,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:WarCrimes
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Spy.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Spy.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -485,7 +485,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Spy
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_IntergovernmentalOrganization.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_IntergovernmentalOrganization.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -493,7 +493,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:IntergovernmentalOrganization
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_CriminalLeadership.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_CriminalLeadership.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -501,7 +501,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:CriminalLeadership
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Theft.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/node_Theft.csv' AS row
             WITH row WHERE row.id IS NOT NULL
             call { with row
             MERGE (n:Entity { id: row.id })
@@ -509,7 +509,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET n:Theft
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_OWNERSHIP.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_OWNERSHIP.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -521,7 +521,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.endDate = row.endDate
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_NAME.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_NAME.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -530,7 +530,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_IDENTIFIER.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_IDENTIFIER.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -539,7 +539,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ENTITY.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ENTITY.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -548,7 +548,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ADDRESS_ENTITY.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ADDRESS_ENTITY.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -557,7 +557,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HOLDER.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HOLDER.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -566,7 +566,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_UNKNOWN_LINK.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_UNKNOWN_LINK.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -576,7 +576,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.role = row.role
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_FAMILY.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_FAMILY.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -586,7 +586,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.relationship = row.relationship
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_DIRECTORSHIP.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_DIRECTORSHIP.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -598,7 +598,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.endDate = row.endDate
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_EMAIL.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_EMAIL.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -607,7 +607,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_PHONE.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_HAS_PHONE.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -616,7 +616,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_MEMBERSHIP.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_MEMBERSHIP.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -628,7 +628,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.endDate = row.endDate
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_REPRESENTATION.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_REPRESENTATION.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -638,7 +638,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.role = row.role
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ISSUER.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ISSUER.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -647,7 +647,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_OWNER.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_OWNER.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -656,7 +656,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_EMPLOYMENT.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_EMPLOYMENT.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -668,7 +668,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.endDate = row.endDate
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ASSOCIATE.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_ASSOCIATE.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -678,7 +678,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             SET r.relationship = row.relationship
             } in transactions of 50000 rows;
 
-            :auto LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_PARENT.csv' AS row
+            LOAD CSV WITH HEADERS FROM 'https://data.opensanctions.org/contrib/offshore-graph/exports/edge_PARENT.csv' AS row
             WITH row WHERE row.source_id IS NOT NULL AND row.target_id IS NOT NULL
             call { with row 
             MATCH (s:Entity {id: row.source_id})
@@ -686,7 +686,7 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             MERGE (s)-[r:PARENT]->(t)
             
             } in transactions of 50000 rows;
-:auto MATCH (n:name) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
-:auto MATCH (n:email) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
-:auto MATCH (n:phone) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
-:auto MATCH (n:identifier) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
+MATCH (n:name) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
+MATCH (n:email) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
+MATCH (n:phone) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
+MATCH (n:identifier) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;

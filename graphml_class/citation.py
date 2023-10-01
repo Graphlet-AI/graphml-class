@@ -11,11 +11,13 @@ from typing import Dict, List, Union
 import dgl
 import networkx as nx
 import numpy as np
+import pandas as pd
 import requests
 import torch
 from dgl.data import DGLDataset
 from dgl.data.utils import download as dgl_download
 from dgl.data.utils import load_graphs, save_graphs
+from dgl.sampling import global_uniform_negative_sampling
 from sentence_transformers import SentenceTransformer
 from torch import Tensor
 
@@ -298,6 +300,17 @@ def main():
     # Write the entire network using GEXF format - the date has to be in UTC format for this to work.
     nx.write_gexf(G, path="data/physics_embeddings.gexf", prettyprint=True)
 
+    #
+    # Create a pd.DataFrame of the nodes for analysis in a notebook
+    #
+
+    # Extract nodes and their attributes into a list of dictionaries
+    node_data = [{**{"node": node}, **attr} for node, attr in G.nodes(data=True)]
+
+    # Convert the list of dictionaries into a DataFrame
+    node_df = pd.DataFrame(node_data)
+    node_df
+
 
 class CitationGraphDataset(DGLDataset):
     """CitationGraphDataset DGLDataset sub-class for loading our citation network dataset.
@@ -395,7 +408,9 @@ class CitationGraphDataset(DGLDataset):
     def process(self):
         """process Build graph and node features from sbert on raw data."""
 
+        #
         # Build the graph U/V edge Tensors
+        #
         u, v = [], []
         current_idx = 0
         edge_path = os.path.join(self.raw_dir, "cit-HepTh.txt.gz")
@@ -427,6 +442,23 @@ class CitationGraphDataset(DGLDataset):
         # Build our DGLGraph from the edge list :)
         self._g = dgl.graph((torch.tensor(u), torch.tensor(v)))
         self._g.ndata["x"] = self.featurize(file_to_net)
+
+        #
+        # Build label set for link prediction: balanced positive / negative, count = number of edges
+        #
+
+        # The real edges are the positive labels
+        pos_src, pos_dst = self._g.edges()
+
+        # Negative sample labels sized by the number of actual, positive edges
+        neg_src, neg_dst = global_uniform_negative_sampling(self._g, self._g.number_of_edges())
+
+        # Combine positive and negative samples
+        self.src_nodes = torch.cat([pos_src, neg_src])
+        self.dst_nodes = torch.cat([pos_dst, neg_dst])
+
+        # Generate labels: 1 for positive and 0 for negative samples
+        self.labels = torch.cat([torch.ones_like(pos_src), torch.zeros_like(neg_src)]).float()
 
     def __getitem__(self, idx):
         assert idx == 0, "This dataset has only one graph"

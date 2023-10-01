@@ -1,3 +1,6 @@
+CREATE DATABASE open_sanctions;
+USE open_sanctions;
+
 CREATE CONSTRAINT entity_id IF NOT EXISTS FOR(n:Entity) REQUIRE (n.id) IS UNIQUE;
 CREATE CONSTRAINT name_id IF NOT EXISTS FOR(n:name) REQUIRE (n.id) IS UNIQUE;
 CREATE CONSTRAINT email_id IF NOT EXISTS FOR(n:email) REQUIRE (n.id) IS UNIQUE;

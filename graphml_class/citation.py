@@ -20,7 +20,8 @@ from dgl.data.utils import download as dgl_download
 from dgl.data.utils import load_graphs, save_graphs
 from dgl.sampling import global_uniform_negative_sampling
 from sentence_transformers import SentenceTransformer
-from sklearn.cluster import KMeans
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
 from torch import Tensor
 
 model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
@@ -315,15 +316,33 @@ def main():
     # Cleanup
     node_df.fillna("", inplace=True)
 
-    # Embed the dirty Journal-ref and cluster it to produce labels.
+    # Step 1. Embed the dirty Journal-ref and cluster it to produce journal class labels.
     model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
 
     # Embed these columns
-    for column in ["Journal-ref", "Title", "Abstract"]:
+    for column in ["Title", "Abstract", "Journal-ref"]:
         embeddings = model.encode(node_df[column].tolist())
         node_df[f"{column}Embedding"] = embeddings.tolist()
 
+    #
+    # TODO: Put code below in a LOOP
+    #
+
+    # It's a good practice to scale the data to have a mean = 0 and variance = 1
+    # This helps UMAP and DBSCAN perform better
+    scaler = StandardScaler()
+    scaled_embeddings = scaler.fit_transform(embeddings)
+
+    # Step 2: Dimension Reduction with UMAP
     reducer = umap.UMAP()
+    reduced_embeddings = reducer.fit_transform(scaled_embeddings)
+
+    # Step 3: Clustering with DBSCAN - you can search for the best hyperparameters
+    dbscan = DBSCAN(eps=0.5, min_samples=500)
+    clusters = dbscan.fit_predict(reduced_embeddings)
+
+    # Now, each point has a cluster label, which could be -1 for noise points
+    node_df["Cluster"] = clusters
 
 
 class CitationGraphDataset(DGLDataset):

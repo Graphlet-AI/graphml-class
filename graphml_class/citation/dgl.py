@@ -11,6 +11,7 @@ from dgl.data.utils import download as dgl_download
 from dgl.data.utils import load_graphs, save_graphs
 from dgl.sampling import global_uniform_negative_sampling
 from sentence_transformers import SentenceTransformer
+from sklearn.model_selection import train_test_split
 
 
 class CitationGraphDataset(DGLDataset):
@@ -147,8 +148,8 @@ class CitationGraphDataset(DGLDataset):
                     v.append(file_to_net[cited_key])
 
         # Build our DGLGraph from the edge list :)
-        self.graph = dgl.graph((torch.tensor(u), torch.tensor(v)))
-        self.graph.ndata["feat"] = self.featurize(file_to_net)
+        graph = dgl.graph((torch.tensor(u), torch.tensor(v)))
+        graph.ndata["feat"] = self.featurize(file_to_net)
 
         #
         # Build label set for link prediction: balanced positive / negative, count = number of edges
@@ -158,18 +159,23 @@ class CitationGraphDataset(DGLDataset):
         pos_src, pos_dst = self.graph.edges()
 
         # Negative sample labels sized by the number of actual, positive edges
-        neg_src, neg_dst = global_uniform_negative_sampling(
-            self.graph, self.graph.number_of_edges()
-        )
+        neg_src, neg_dst = global_uniform_negative_sampling(graph, graph.number_of_edges())
 
         # Combine positive and negative samples
         self.src_nodes = torch.cat([pos_src, neg_src])
         self.dst_nodes = torch.cat([pos_dst, neg_dst])
 
+        # Splitting mask for dgl.DGLGraph.edata
+        graph.edata["train_mask"] = train_mask
+        graph.edata["val_mask"] = val_mask
+        graph.edata["test_mask"] = test_mask
+
         # Generate labels: 1 for positive and 0 for negative samples
-        self.graph.ndata["label"] = torch.cat(
+        graph.ndata["label"] = torch.cat(
             [torch.ones_like(pos_src), torch.zeros_like(neg_src)]
         ).float()
+
+        self.graph = graph
 
     def __getitem__(self, idx):
         assert idx == 0, "This dataset has only one graph"

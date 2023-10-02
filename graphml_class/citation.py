@@ -14,11 +14,13 @@ import numpy as np
 import pandas as pd
 import requests
 import torch
+import umap
 from dgl.data import DGLDataset
 from dgl.data.utils import download as dgl_download
 from dgl.data.utils import load_graphs, save_graphs
 from dgl.sampling import global_uniform_negative_sampling
 from sentence_transformers import SentenceTransformer
+from sklearn.cluster import KMeans
 from torch import Tensor
 
 model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
@@ -309,7 +311,19 @@ def main():
 
     # Convert the list of dictionaries into a DataFrame
     node_df = pd.DataFrame(node_data)
-    node_df
+
+    # Cleanup
+    node_df.fillna("", inplace=True)
+
+    # Embed the dirty Journal-ref and cluster it to produce labels.
+    model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
+
+    # Embed these columns
+    for column in ["Journal-ref", "Title", "Abstract"]:
+        embeddings = model.encode(node_df[column].tolist())
+        node_df[f"{column}Embedding"] = embeddings.tolist()
+
+    reducer = umap.UMAP()
 
 
 class CitationGraphDataset(DGLDataset):

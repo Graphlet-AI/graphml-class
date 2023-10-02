@@ -473,29 +473,33 @@ class CitationGraphDataset(DGLDataset):
                     v.append(file_to_net[cited_key])
 
         # Build our DGLGraph from the edge list :)
-        self._g = dgl.graph((torch.tensor(u), torch.tensor(v)))
-        self._g.ndata["x"] = self.featurize(file_to_net)
+        self.graph = dgl.graph((torch.tensor(u), torch.tensor(v)))
+        self.graph.ndata["feat"] = self.featurize(file_to_net)
 
         #
         # Build label set for link prediction: balanced positive / negative, count = number of edges
         #
 
         # The real edges are the positive labels
-        pos_src, pos_dst = self._g.edges()
+        pos_src, pos_dst = self.graph.edges()
 
         # Negative sample labels sized by the number of actual, positive edges
-        neg_src, neg_dst = global_uniform_negative_sampling(self._g, self._g.number_of_edges())
+        neg_src, neg_dst = global_uniform_negative_sampling(
+            self.graph, self.graph.number_of_edges()
+        )
 
         # Combine positive and negative samples
         self.src_nodes = torch.cat([pos_src, neg_src])
         self.dst_nodes = torch.cat([pos_dst, neg_dst])
 
         # Generate labels: 1 for positive and 0 for negative samples
-        self.labels = torch.cat([torch.ones_like(pos_src), torch.zeros_like(neg_src)]).float()
+        self.graph.ndata["label"] = torch.cat(
+            [torch.ones_like(pos_src), torch.zeros_like(neg_src)]
+        ).float()
 
     def __getitem__(self, idx):
         assert idx == 0, "This dataset has only one graph"
-        return self._g
+        return self.graph
 
     def __len__(self):
         """__len__ we are one graph long"""
@@ -503,11 +507,11 @@ class CitationGraphDataset(DGLDataset):
 
     def save(self):
         """save Save our one graph to directory `self.save_path`"""
-        save_graphs(self._save_path, [self._g])
+        save_graphs(self._save_path, [self.graph])
 
     def load(self):
         """load Load processed data from directory `self.save_path`"""
-        self._g = load_graphs(self._save_path)[0]
+        self.graph = load_graphs(self._save_path)[0]
 
     def has_cache(self):
         """has_cache Check whether there are processed data in `self.save_path`"""

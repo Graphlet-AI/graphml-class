@@ -294,50 +294,6 @@ def main():
         sort_keys=True,
     )
 
-    # Write the entire network using GEXF format - the date has to be in UTC format for this to work.
-    nx.write_gexf(G, path="data/physics_embeddings.gexf", prettyprint=True)
-
-    #
-    # Create a pd.DataFrame of the nodes for analysis in a notebook
-    #
-
-    # Extract nodes and their attributes into a list of dictionaries
-    node_data = [{**{"node": node}, **attr} for node, attr in G.nodes(data=True)]
-
-    # Convert the list of dictionaries into a DataFrame
-    node_df = pd.DataFrame(node_data)
-
-    # Cleanup
-    node_df.fillna("", inplace=True)
-
-    # Step 1. Embed the dirty Journal-ref and cluster it to produce journal class labels.
-    model = SentenceTransformer("sentence-transformers/paraphrase-MiniLM-L6-v2")
-
-    # Embed these columns
-    for column in ["Title", "Abstract", "Journal-ref"]:
-        embeddings = model.encode(node_df[column].tolist())
-        node_df[f"{column}Embedding"] = embeddings.tolist()
-
-    #
-    # TODO: Put code below in a LOOP
-    #
-
-    # It's a good practice to scale the data to have a mean = 0 and variance = 1
-    # This helps UMAP and DBSCAN perform better
-    scaler = StandardScaler()
-    scaled_embeddings = scaler.fit_transform(embeddings)
-
-    # Step 2: Dimension Reduction with UMAP
-    reducer = umap.UMAP()
-    reduced_embeddings = reducer.fit_transform(scaled_embeddings)
-
-    # Step 3: Clustering with DBSCAN - you can search for the best hyperparameters
-    dbscan = DBSCAN(eps=0.5, min_samples=500)
-    clusters = dbscan.fit_predict(reduced_embeddings)
-
-    # Now, each point has a cluster label, which could be -1 for noise points
-    node_df["Cluster"] = clusters
-
 
 if __name__ == "__main__":
     main()

@@ -41,6 +41,7 @@ graphdatascience = "^1.7"
 torchmetrics = "^1.1.2"
 umap-learn = "^0.5.4"
 dgl = "1.1.1"
+faiss-cpu = "^1.7.4"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

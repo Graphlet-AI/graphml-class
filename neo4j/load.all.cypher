@@ -1,3 +1,7 @@
+# This script comes from Open Sanctions and uses their data. The copyright belongs to Open Sanctions, not Graphlet AI.
+# This is only here because I fixed some issues I was having issues with their script and fixed them here.
+# Find the full script at: https://github.com/opensanctions/offshore-graph#sanctionsoffshores-graph-demo
+
 CREATE CONSTRAINT entity_id IF NOT EXISTS FOR(n:Entity) REQUIRE (n.id) IS UNIQUE;
 CREATE CONSTRAINT name_id IF NOT EXISTS FOR(n:name) REQUIRE (n.id) IS UNIQUE;
 CREATE CONSTRAINT email_id IF NOT EXISTS FOR(n:email) REQUIRE (n.id) IS UNIQUE;

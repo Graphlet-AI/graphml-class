@@ -686,7 +686,8 @@ CREATE CONSTRAINT identifier_id IF NOT EXISTS FOR(n:identifier) REQUIRE (n.id) I
             MERGE (s)-[r:PARENT]->(t)
             
             } in transactions of 50000 rows;
-MATCH (n:name) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
-MATCH (n:email) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
-MATCH (n:phone) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
-MATCH (n:identifier) WHERE size((n)--()) <= 1 call { with n     DETACH DELETE (n) } in transactions of 50000 rows;
+
+MATCH (n:name) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with n DETACH DELETE (n) } in transactions of 50000 rows;
+MATCH (n:email) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with n DETACH DELETE (n) } in transactions of 50000 rows;
+MATCH (n:phone) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with n DETACH DELETE (n) } in transactions of 50000 rows;
+MATCH (n:identifier) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with n DETACH DELETE (n) } in transactions of 50000 rows;

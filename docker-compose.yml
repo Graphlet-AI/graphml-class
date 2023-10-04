@@ -15,6 +15,7 @@ services:
       - ./data:/home/jovyan/data
     environment:
       - JUPYTER_ENABLE_LAB=yes
+      - DGLBACKEND=pytorch
     env_file:
       - envs/graphistry.env
       - envs/search.env

@@ -695,3 +695,11 @@ MATCH (n:name) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with
 MATCH (n:email) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with n DETACH DELETE (n) } in transactions of 50000 rows;
 MATCH (n:phone) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with n DETACH DELETE (n) } in transactions of 50000 rows;
 MATCH (n:identifier) WITH n, size([p=(n)--() | p]) as size WHERE size <= 1 call { with n DETACH DELETE (n) } in transactions of 50000 rows;
+
+// clean empty properties
+CALL apoc.periodic.iterate(
+  "MATCH (n) UNWIND keys(n) as k WITH n, k WHERE n[k] = '' RETURN n, k",
+  "WITH n, collect(k) as propertyKeys
+   CALL apoc.create.removeProperties(n, propertyKeys) YIELD node
+   RETURN node",
+  {batchSize:50000, parallel:true});

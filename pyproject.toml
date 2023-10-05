@@ -42,6 +42,7 @@ torchmetrics = "^1.1.2"
 umap-learn = "^0.5.4"
 dgl = "1.1.1"
 faiss-cpu = "^1.7.4"
+karateclub = {git = "https://github.com/rjurney/karateclub.git", rev = "rjurney/dependency-update"}
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

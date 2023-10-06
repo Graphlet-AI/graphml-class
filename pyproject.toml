@@ -1,13 +1,13 @@
 [tool.poetry]
-name = "graphml-class"
+name = "Full Stack Graph Machine Learning"
 version = "0.1.0"
-description = "Graphlet AI - Graph Machine Learning and Network Science: Theory, Practice, Tools and Techniques"
+description = "Graphlet AI - Full Stack Graph Machine Learning: Theory, Practice, Tools and Techniques"
 authors = ["Russell Jurney <rjurney@graphlet.ai>"]
 license = "COMMERCIAL"
 readme = "README.md"
 packages = [{include = "graphml_class"}]
 
-[project.urls]
+[tool.poetry.urls]
 "Company Homepage" = "https://graphlet.ai"
 "Class Homepage" = "https://technologytransfer.it/events-mec/graph-machine-learning-2/"
 "Teacher Homepage" = "https://linkedin.com/in/russelljurney"
@@ -15,7 +15,7 @@ packages = [{include = "graphml_class"}]
 "Bug Tracker" = "https://github.com/Graphlet-AI/graphml-class/issues"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.13"
+python = ">=3.10,<3.13"
 python-dateutil = "^2.8.2"
 graphistry = {extras = ["ai"], version = "^0.29.1"}
 littleballoffur = { git = "https://github.com/Graphlet-AI/littleballoffur.git", branch = "rjurney/unpin-get-nodes" }

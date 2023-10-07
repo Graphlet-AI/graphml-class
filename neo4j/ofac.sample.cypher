@@ -27,3 +27,9 @@ CALL apoc.cypher.run("
                     MATCH (sanctioned)-[e2:OWNERSHIP|OWNER|DIRECTORSHIP|PARENT]-(other_entity)
                     RETURN DISTINCT(other_entity) as node;
 ", {}) YIELD value WITH COLLECT(value.node) AS all_nodes
+
+// Use the collected nodes in another part of the query
+UNWIND all_nodes AS node1
+UNWIND all_nodes AS node2
+MATCH (node1)-[relationship:OWNERSHIP|OWNER|DIRECTORSHIP|PARENT]-(node2)
+RETURN DISTINCT node1, relationship, node2;

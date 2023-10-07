@@ -703,3 +703,6 @@ CALL apoc.periodic.iterate(
    CALL apoc.create.removeProperties(n, propertyKeys) YIELD node
    RETURN node",
   {batchSize:50000, parallel:true});
+
+// index sanctioning bodies to search for OFAC
+CREATE FULLTEXT INDEX SanctionIndex IF NOT EXISTS FOR (n:Sanction) ON EACH [n.authority];

@@ -44,6 +44,7 @@ dgl = "1.1.1"
 faiss-cpu = "^1.7.4"
 karateclub = {git = "https://github.com/rjurney/karateclub.git", rev = "rjurney/dependency-update"}
 neo4j = "5.12.0"
+scikit-learn = "^1.3.1"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

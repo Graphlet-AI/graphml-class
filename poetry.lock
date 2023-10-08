@@ -4361,6 +4361,7 @@ opt-einsum = ["opt-einsum (>=3.3)"]
 [package.source]
 type = "url"
 url = "https://files.pythonhosted.org/packages/81/58/431fd405855553af1a98091848cf97741302416b01462bbf9909d3c422b3/torch-1.13.1-cp310-cp310-manylinux1_x86_64.whl"
+
 [[package]]
 name = "torch"
 version = "1.13.1"
@@ -4381,6 +4382,7 @@ opt-einsum = ["opt-einsum (>=3.3)"]
 [package.source]
 type = "url"
 url = "https://files.pythonhosted.org/packages/82/d8/0547f8a22a0c8aeb7e7e5e321892f1dcf93ea021829a99f1a25f1f535871/torch-1.13.1-cp310-none-macosx_10_9_x86_64.whl"
+
 [[package]]
 name = "torch-geometric"
 version = "2.3.1"
@@ -4800,4 +4802,4 @@ test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "5ccb0fecd736274400a072d8879155e128715108be6888ccce2548a4457ce164"
+content-hash = "0fae7f2f1a28c8061e44c2aafd3b8201b0c27bf54591ca7dc527abed004827e7"

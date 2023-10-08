@@ -46,6 +46,7 @@ karateclub = {git = "https://github.com/rjurney/karateclub.git", rev = "rjurney/
 neo4j = "5.12.0"
 scikit-learn = "^1.3.1"
 graphrole = { git = "https://github.com/rjurney/graphrole.git", branch = "rjurney/dependency-update" }
+pyspark = "^3.5.0"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

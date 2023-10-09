@@ -11,7 +11,11 @@ USER root
 RUN sudo apt update && \
     sudo apt upgrade -y && \
     sudo apt install curl -y && \
+    sudo apt install openjdk-17-jdk-headless -y && \
     rm -rf /var/lib/apt/lists/*
+
+# Set JAVA_HOME for PySpark
+ENV JAVA_HOME /usr/lib/jvm/java-17-openjdk-amd64/
 
 # Go back to jovyan user so we don't have permission problems
 USER ${NB_USER}

@@ -32,4 +32,5 @@ COPY --chown=${NB_UID}:${NB_GID} poetry.lock    "/home/${NB_USER}/work/"
 WORKDIR "/home/${NB_USER}/work"
 RUN poetry config virtualenvs.create false && \
     poetry config installer.max-workers 10 && \
-    poetry install --no-interaction --no-ansi --no-root -vvv
+    poetry install --no-interaction --no-ansi --no-root -vvv && \
+    poetry cache clear pypi --all -n

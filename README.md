@@ -9,6 +9,9 @@ This is a course from Graphlet AI on full-stack graph machine learning taught by
 This project uses Docker image [rjurney/graphml-class](https://hub.docker.com/repository/docker/rjurney/graphml-class/general). To bring it up as the `jupyter` service along with `neo4j`, run:
 
 ```bash
+# Pull the Docker images
+docker compose pull
+
 # Run a Jupyter Notebook container in the background with all requirements.txt installed
 docker compose up -d
 

@@ -17,7 +17,7 @@ packages = [{include = "graphml_class"}]
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
 python-dateutil = "^2.8.2"
-graphistry = {extras = ["ai"], version = "^0.29.1"}
+graphistry = {extras = ["ai"], version = "^0.29.5"}
 littleballoffur = { git = "https://github.com/Graphlet-AI/littleballoffur.git", branch = "rjurney/unpin-get-nodes" }
 networkx = ">=3.1"
 numpy = "^1.24.3"
@@ -45,7 +45,7 @@ faiss-cpu = "^1.7.4"
 karateclub = {git = "https://github.com/rjurney/karateclub.git", rev = "rjurney/dependency-update"}
 neo4j = "5.12.0"
 scikit-learn = "^1.3.1"
-graphrole = { git = "https://github.com/rjurney/graphrole.git", branch = "rjurney/dependency-update" }
+graphrole = "^1.1.1"
 pyspark = "^3.5.0"
 
 [tool.poetry.group.dev.dependencies]

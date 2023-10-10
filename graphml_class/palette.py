@@ -1,3 +1,6 @@
+from typing import List
+
+
 # A big palette from 3 different palettes from: https://www.heavy.ai/blog/12-color-palettes-for-telling-better-stories-with-your-data
 CATEGORICAL_PALETTE: List[str] = (
     [

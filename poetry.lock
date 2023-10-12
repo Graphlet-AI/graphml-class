@@ -721,6 +721,22 @@ files = [
 ]
 
 [[package]]
+name = "deepsnap"
+version = "0.2.1"
+description = "Deepsnap package"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "deepsnap-0.2.1.tar.gz", hash = "sha256:656a934757c72ff251291d687d95143e7841c487373f53e30d2c05d4aac40d8d"},
+]
+
+[package.dependencies]
+networkx = "*"
+numpy = "*"
+torch = "*"
+
+[[package]]
 name = "defusedxml"
 version = "0.7.1"
 description = "XML bomb protection for Python stdlib modules"
@@ -5335,4 +5351,4 @@ scikit-learn = ["scikit-learn"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "569168c103f3075c08d2f1a116a5f856f9151066ecb208e45a88766828e3d3b8"
+content-hash = "c9aa92aa1d12b72d847c609e64bccc4eb8a3cc112d9a38f728235a8ef76b89b5"

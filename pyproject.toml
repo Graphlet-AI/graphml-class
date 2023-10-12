@@ -50,6 +50,7 @@ pyspark = "^3.5.0"
 xgboost = "^2.0.0"
 igraph = "^0.10.8"
 optuna = "^3.3.0"
+deepsnap = "^0.2.1"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

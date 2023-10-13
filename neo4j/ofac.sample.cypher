@@ -29,12 +29,12 @@ CALL apoc.cypher.run("
 ", {}) YIELD value WITH COLLECT(value.node) AS all_nodes
 
 // Use the collected nodes in another part of the query
-UNWIND all_nodes AS entity
-// UNWIND all_nodes AS node2
-MATCH (entity)-[control:OWNERSHIP|OWNER|DIRECTORSHIP|PARENT]-(entity)
+UNWIND all_nodes AS node1
+UNWIND all_nodes AS node2
+MATCH (node1)-[control:OWNERSHIP|OWNER|DIRECTORSHIP|PARENT]-(node2)
 
-WITH collect(DISTINCT entity) AS entities, collect(DISTINCT control) AS controls
-CALL apoc.export.csv.data(entities, controls, "ofac-1.5-hop.csv", {})
+WITH collect(DISTINCT node1) AS nodes1, COLLECT(DISTINCT node2) AS nodes2//, collect(DISTINCT control) AS controls
+CALL apoc.export.csv.data(nodes1 + nodes2, [], "ofac-1.5-hop-nodes-2.csv", {})
 YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data
 RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data;
 // RETURN DISTINCT node1, relationship, node2;

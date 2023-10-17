@@ -161,14 +161,14 @@ class CitationGraphDataset(DGLDataset):
         # Negative sample labels sized by the number of actual, positive edges
         neg_src, neg_dst = global_uniform_negative_sampling(graph, graph.number_of_edges())
 
-        # Combine positive and negative samples
-        self.src_nodes = torch.cat([pos_src, neg_src])
-        self.dst_nodes = torch.cat([pos_dst, neg_dst])
+        # # Combine positive and negative samples
+        # self.src_nodes = torch.cat([pos_src, neg_src])
+        # self.dst_nodes = torch.cat([pos_dst, neg_dst])
 
-        # Splitting mask for dgl.DGLGraph.edata
-        graph.edata["train_mask"] = train_mask
-        graph.edata["val_mask"] = val_mask
-        graph.edata["test_mask"] = test_mask
+        # # Splitting mask for dgl.DGLGraph.edata
+        # graph.edata["train_mask"] = train_mask
+        # graph.edata["val_mask"] = val_mask
+        # graph.edata["test_mask"] = test_mask
 
         # Generate labels: 1 for positive and 0 for negative samples
         graph.ndata["label"] = torch.cat(

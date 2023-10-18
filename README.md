@@ -55,7 +55,7 @@ conda activate graphml
 Install the project's libraries:
 
 ```bash
-pip install -r requirements.txt
+poetry install
 ```
 
 ### VSCode Interpretter

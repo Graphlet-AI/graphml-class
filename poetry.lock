@@ -3287,17 +3287,6 @@ networkx = "*"
 numpy = "*"
 
 [[package]]
-name = "python-ulid"
-version = "2.2.0"
-description = "Universally unique lexicographically sortable identifier"
-optional = false
-python-versions = ">=3.9"
-files = [
-    {file = "python_ulid-2.2.0-py3-none-any.whl", hash = "sha256:ec2e69292c0b7c338a07df5e15b05270be6823675c103383e74d1d531945eab5"},
-    {file = "python_ulid-2.2.0.tar.gz", hash = "sha256:9ec777177d396880d94be49ac7eb4ae2cd4a7474448bfdbfe911537add970aeb"},
-]
-
-[[package]]
 name = "pytz"
 version = "2023.3.post1"
 description = "World timezone definitions, modern and historical"
@@ -5252,4 +5241,4 @@ scikit-learn = ["scikit-learn"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.13"
-content-hash = "9918454e1c787c46316c86200499f9df9893170a44ec1a7ff2d3eaffeca7fa70"
+content-hash = "41bf6a76bef6f3c329e6b20b39dd2baea444ae12b3eb74722917b176ecde6526"

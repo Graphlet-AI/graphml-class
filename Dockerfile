@@ -3,7 +3,7 @@ FROM jupyter/scipy-notebook:python-3.10.11
 
 # Needed for poetry package management: no venv, latest poetry, GRANT_SUDO don't work :(
 ENV POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_VERSION=1.7.1 \
+    POETRY_VERSION=1.8.3 \
     GRANT_SUDO=yes
 
 # The docker stacks make sudo very difficult, so we [just be root™]

@@ -1,3 +1,5 @@
+#!pyspark --packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 --driver-memory 16g --executor-memory 8g
+
 import os
 import resource
 from typing import List
@@ -5,6 +7,7 @@ from typing import List
 import pandas as pd
 import pyspark.sql.functions as F
 from graphframes import GraphFrame
+from pyspark import SparkContext
 from pyspark.sql import DataFrame, SparkSession
 
 # This is actually already set in Docker, just reminding you Java is needed
@@ -12,7 +15,10 @@ os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"
 
 # Setup PySpark to use the GraphFrames jar package from maven central
 os.environ["PYSPARK_SUBMIT_ARGS"] = (
-    "--packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 pyspark-shell"
+    "--packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 pyspark-shell "
+    "--driver-memory 4g pyspark-shell "
+    "--executor-memory 4g pyspark-shell "
+    "--driver-java-options='-Xmx4g -Xms4g' "
 )
 
 # Show all the rows in a pd.DataFrame
@@ -33,6 +39,19 @@ def print_memory_usage():
 
 
 #
+# Clean up any previous SparkSession so we can create a new one with > 1g RAM
+#
+if "spark" in locals() or "spark" in globals():
+    try:
+        spark.stop()  # type: ignore
+        del sc  # type: ignore
+        del spark  # type: ignore
+        print("Stopped the existing SparkSession to start one with higher memory.")
+    except NameError:
+        print("No existing SparkSession to stop.")
+
+
+#
 # Initialize a SparkSession. You can configre SparkSession via: .config("spark.some.config.option", "some-value")
 #
 spark: SparkSession = (
@@ -40,16 +59,19 @@ spark: SparkSession = (
     # Lets the Id:(Stack Overflow int) and id:(GraphFrames ULID) coexist
     .config("spark.sql.caseSensitive", True)
     # Single node mode - 128GB machine
-    .config("spark.driver.memory", "96g").getOrCreate()
+    .config("spark.driver.memory", "48g")
+    .config("spark.executor.memory", "48g")
+    .getOrCreate()
 )
+sc: SparkContext = spark.sparkContext
 
 
 #
 # Load the Posts...
 #
-posts_df: DataFrame = spark.read.parquet("data/stats.meta.stackexchange.com/Posts.parquet").withColumn(
-    "Type", F.lit("Post")
-)
+posts_df: DataFrame = spark.read.parquet(
+    "data/stats.meta.stackexchange.com/Posts.parquet"
+).withColumn("Type", F.lit("Post"))
 
 print(f"\nTotal stats.meta.stackexchange.com Posts: {posts_df.count():,}\n")
 
@@ -57,18 +79,18 @@ print(f"\nTotal stats.meta.stackexchange.com Posts: {posts_df.count():,}\n")
 #
 # Load the Users...
 #
-users_df: DataFrame = spark.read.parquet("data/stats.meta.stackexchange.com/Users.parquet").withColumn(
-    "Type", F.lit("User")
-)
+users_df: DataFrame = spark.read.parquet(
+    "data/stats.meta.stackexchange.com/Users.parquet"
+).withColumn("Type", F.lit("User"))
 print(f"\nTotal Users: {users_df.count():,}\n")
 
 
 #
 # Load the Votes...
 #
-votes_df: DataFrame = spark.read.parquet("data/stats.meta.stackexchange.com/Votes.parquet").withColumn(
-    "Type", F.lit("Vote")
-)
+votes_df: DataFrame = spark.read.parquet(
+    "data/stats.meta.stackexchange.com/Votes.parquet"
+).withColumn("Type", F.lit("Vote"))
 print(f"Total Votes: {votes_df.count():,}")
 
 
@@ -117,6 +139,16 @@ NODES_PATH: str = "data/stats.meta.stackexchange.com/Nodes.parquet"
 # Write to disk and back again
 nodes_df.write.mode("overwrite").parquet(NODES_PATH)
 nodes_df: DataFrame = spark.read.parquet(NODES_PATH)
+
+nodes_df.select("id", "Type").groupBy("Type").count().show()
+
+# +----+------+
+# |Type|count |
+# +----+------+
+# |Vote|41,851|
+# |User|36,653|
+# |Post| 4,930|
+# +----+------+
 
 # Helps performance of GraphFrames' algorithms
 nodes_df: DataFrame = nodes_df.cache()
@@ -239,4 +271,42 @@ print(f"Percentage of linked posts: {posted_edge_df.count() / posts_df.count():.
 #
 # Combine all the edges together into one relationships DataFrame
 #
-relationships: DataFrame = 
+relationships_df: DataFrame = (
+    voted_for_edge_df.union(asked_edges_df).union(answered_edges_df).union(posted_edge_df)
+)
+
+relationships_df.groupBy("relationship").count().show()
+
+# +------------+------+
+# |relationship|count |
+# +------------+------+
+# |    VotedFor|39,994|
+# |       Asked| 1,994|
+# |     Answers| 2,936|
+# |      Posted| 4,628|
+# +------------+------+
+
+EDGES_PATH: str = "data/stats.meta.stackexchange.com/Edges.parquet"
+
+# Write to disk and back again
+relationships_df.write.mode("overwrite").parquet(EDGES_PATH)
+relationships_df: DataFrame = spark.read.parquet(EDGES_PATH)
+
+# Helps performance of GraphFrames' algorithms
+relationships_df: DataFrame = relationships_df.cache()
+
+
+#
+# Create the GraphFrame
+#
+g = GraphFrame(nodes_df, relationships_df)
+
+g.vertices.show()
+g.edges.show()
+
+# Test out Connected Components
+sc.setCheckpointDir("/tmp/spark-checkpoints")
+components = g.connectedComponents()
+(components.select("id", "component").groupBy("component").count().sort(F.desc("count")).show())
+
+g.find("(a)-[e]->(b)").show()

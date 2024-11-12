@@ -59,8 +59,8 @@ spark: SparkSession = (
     # Lets the Id:(Stack Overflow int) and id:(GraphFrames ULID) coexist
     .config("spark.sql.caseSensitive", True)
     # Single node mode - 128GB machine
-    .config("spark.driver.memory", "48g")
-    .config("spark.executor.memory", "48g")
+    .config("spark.driver.memory", "16g")
+    .config("spark.executor.memory", "8g")
     .getOrCreate()
 )
 sc: SparkContext = spark.sparkContext
@@ -210,26 +210,26 @@ print(f"Percentage of linked votes: {voted_for_edge_df.count() / votes_df.count(
 #
 # Create a [User]--Cast-->[Vote] edge
 #
-user_voted_df: DataFrame = users_df.select(
-    F.col("id").alias("src"),
-    F.col("Id").alias("UserId"),
-    # Everything has all the fields - should build from base records but need UUIDs
-    F.col("PostId").alias("VotePostId"),
-)
-user_voted_edge_df: DataFrame = (
-    user_voted_df.join(votes_df, user_voted_df.UserId == votes_df.Id)
-    .select(
-        # 'src' comes from the votes' 'id'
-        "src",
-        # 'dst' comes from the posts' 'id'
-        F.col("id").alias("dst"),
-        # All edges have a 'relationship' field
-        F.lit("Cast").alias("relationship"),
-    )
-    .cache()
-)
-print(f"Total VotedFor edges: {voted_for_edge_df.count():,}")
-print(f"Percentage of linked votes: {voted_for_edge_df.count() / votes_df.count():.2%}\n")
+# user_voted_df: DataFrame = users_df.select(
+#     F.col("id").alias("src"),
+#     F.col("Id").alias("UserId"),
+#     # Everything has all the fields - should build from base records but need UUIDs
+#     F.col("PostId").alias("VotePostId"),
+# )
+# user_voted_edge_df: DataFrame = (
+#     user_voted_df.join(votes_df, user_voted_df.UserId == votes_df.Id)
+#     .select(
+#         # 'src' comes from the votes' 'id'
+#         "src",
+#         # 'dst' comes from the posts' 'id'
+#         F.col("id").alias("dst"),
+#         # All edges have a 'relationship' field
+#         F.lit("Cast").alias("relationship"),
+#     )
+#     .cache()
+# )
+# print(f"Total VotedFor edges: {voted_for_edge_df.count():,}")
+# print(f"Percentage of linked votes: {voted_for_edge_df.count() / votes_df.count():.2%}\n")
 
 
 #

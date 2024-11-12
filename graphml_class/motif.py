@@ -1,4 +1,4 @@
-#!pyspark --packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 --driver-memory 16g --executor-memory 8g
+#!/usr/bin/env pyspark --packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 --driver-memory 16g --executor-memory 8g
 
 import os
 import resource
@@ -208,6 +208,31 @@ print(f"Total VotedFor edges: {voted_for_edge_df.count():,}")
 print(f"Percentage of linked votes: {voted_for_edge_df.count() / votes_df.count():.2%}\n")
 
 #
+# Create a [User]--Cast-->[Vote] edge
+#
+user_voted_df: DataFrame = users_df.select(
+    F.col("id").alias("src"),
+    F.col("Id").alias("UserId"),
+    # Everything has all the fields - should build from base records but need UUIDs
+    F.col("PostId").alias("VotePostId"),
+)
+user_voted_edge_df: DataFrame = (
+    user_voted_df.join(votes_df, user_voted_df.UserId == votes_df.Id)
+    .select(
+        # 'src' comes from the votes' 'id'
+        "src",
+        # 'dst' comes from the posts' 'id'
+        F.col("id").alias("dst"),
+        # All edges have a 'relationship' field
+        F.lit("Cast").alias("relationship"),
+    )
+    .cache()
+)
+print(f"Total VotedFor edges: {voted_for_edge_df.count():,}")
+print(f"Percentage of linked votes: {voted_for_edge_df.count() / votes_df.count():.2%}\n")
+
+
+#
 # Create a answer[User]--Answered-->question[Post] edge
 #
 asked_edges_df: DataFrame = questions_df.select(
@@ -248,7 +273,7 @@ print(f"Percentage of linked answers: {answered_edges_df.count() / answers_df.co
 # Create a [User]--Posted-->[Post] edge
 #
 src_posts_df: DataFrame = posts_df.select(
-    F.col("id").alias("src"),
+    F.col("id").alias("dst"),
     F.col("Id").alias("PostPostId"),
     F.col("OwnerUserId").alias("PostOwnerUserId"),
 )
@@ -257,9 +282,9 @@ posted_edge_df: DataFrame = (
     src_posts_df.join(users_df, src_posts_df.PostOwnerUserId == users_df.Id)
     .select(
         # 'src' comes from the posts' 'id'
-        "src",
+        F.col("id").alias("src"),
         # 'dst' comes from the users' 'id'
-        F.col("id").alias("dst"),
+        "dst",
         # All edges have a 'relationship' field
         F.lit("Posted").alias("relationship"),
     )
@@ -307,6 +332,39 @@ g.edges.show()
 # Test out Connected Components
 sc.setCheckpointDir("/tmp/spark-checkpoints")
 components = g.connectedComponents()
-(components.select("id", "component").groupBy("component").count().sort(F.desc("count")).show())
+components.select("id", "component").groupBy("component").count().sort(F.desc("count")).show()
 
-g.find("(a)-[e]->(b)").show()
+# Shows (User)-[VotedFor]->(Post)--(Answers)->(Post)
+paths = g.find("(a)-[e]->(b); (b)-[e2]->(c)")
+paths.select("a.Type", "e.*", "b.Type", "e2.*", "c.Type").show()
+
+# Shows two matches:
+# - (Post)-[Answers]->(Post)<--[Posted]-(User)
+# - (Post)-[Answers]->(Post)<--[VotedFor]-(User)
+paths = g.find("(a)-[e]->(b); (c)-[e2]->(a)")
+paths.select("a.Type", "e.*", "b.Type", "e2.*", "c.Type").show()
+
+# Figure out how often questions are answered and the question poster votes for the answer. Neat!
+# Shows (User A)-[Posted]->(Post)<-[Answers]-(Post)<-[VotedFor]-(User)
+paths = g.find("(a)-[e]->(b); (c)-[e2]->(b); (d)-[e3]->(c)")
+
+# If the node types are right...
+paths = paths.filter(F.col("a.Type") == "User")
+paths = paths.filter(F.col("b.Type") == "Post")
+paths = paths.filter(F.col("c.Type") == "Post")
+paths = paths.filter(F.col("d.Type") == "User")
+
+# If the edge types are right...
+# paths = paths.filter(F.col("e.relationship") == "Posted")
+# paths = paths.filter(F.col("e2.relationship") == "Answers")
+paths = paths.filter(F.col("e3.relationship") == "VotedFor")
+
+paths.select(
+    "a.Type",
+    "e.relationship",
+    "b.Type",
+    "e2.relationship",
+    "c.Type",
+    "e3.relationship",
+    "d.Type",
+).show()

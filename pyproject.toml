@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Full Stack Graph Machine Learning"
-version = "1.0.0"
+version = "1.1.0"
 description = "Graphlet AI - Full Stack Graph Machine Learning: Theory, Practice, Tools and Techniques"
 authors = ["Russell Jurney <rjurney@graphlet.ai>"]
 license = "MIT"

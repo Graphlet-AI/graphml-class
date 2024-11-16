@@ -8,7 +8,8 @@ import re
 from typing import List
 
 import pyspark.sql.functions as F
-from pyspark.sql import SparkSession
+import pyspark.sql.types as T
+from pyspark.sql import DataFrame, SparkSession
 
 
 # This is actually already set in Docker, just reminding you Java is needed
@@ -27,12 +28,12 @@ os.environ["PYSPARK_SUBMIT_ARGS"] = (
 #
 
 # Initialize a SparkSession. You can configre SparkSession via: .config("spark.some.config.option", "some-value")
-spark = SparkSession.builder.appName(
+spark: SparkSession = SparkSession.builder.appName(
     "Big Graph Builder"
 ).getOrCreate()  # Set app name  # Get or create the SparkSession
 
 
-def remove_prefix(df):
+def remove_prefix(df: DataFrame) -> DataFrame:
     """Remove the _ prefix that Spark-XML adds to all attributes"""
     field_names = [x.name for x in df.schema]
     new_field_names = [x[1:] for x in field_names]
@@ -44,16 +45,16 @@ def remove_prefix(df):
     return df.select(s)
 
 
-@F.udf("array<string>")
-def extract_tags(tags: str) -> List[str]:
-    """Extract the tags from the XML string"""
-    if tags is None:
+@F.udf(returnType=T.ArrayType(T.StringType()))
+def split_tags(tags: str) -> list[str]:
+    if not tags:
         return []
-    return re.findall("<([^>]+)>", tags)
+    # Remove < and > and split into array
+    return re.findall(r"<([^>]+)>", tags)
 
 
 # Use Spark-XML to split the XML file into records
-posts_df = (
+posts_df: DataFrame = (
     spark.read.format("xml")
     .options(rowTag="row")
     .options(rootTag="posts")
@@ -61,13 +62,15 @@ posts_df = (
 )
 
 # Remove the _ prefix from field names
-posts_df = remove_prefix(posts_df)
+posts_df: DataFrame = remove_prefix(posts_df)
 
 # Create a list of tags
-posts_df = (
-    posts_df.withColumn("ParsedTags", extract_tags(posts_df.Tags))
-    .drop("Tags")
-    .withColumnRenamed("ParsedTags", "Tags")
+posts_df: DataFrame = (
+    posts_df.withColumn(
+        "ParsedTags", F.split(F.regexp_replace(F.col("Tags"), "^\\||\\|$", ""), "\\|")
+    )
+    # .drop("Tags")
+    # .withColumnRenamed("ParsedTags", "Tags")
 )
 
 # Write the DataFrame out to Parquet format

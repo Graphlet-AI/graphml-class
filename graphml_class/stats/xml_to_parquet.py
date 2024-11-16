@@ -69,8 +69,8 @@ posts_df: DataFrame = (
     posts_df.withColumn(
         "ParsedTags", F.split(F.regexp_replace(F.col("Tags"), "^\\||\\|$", ""), "\\|")
     )
-    # .drop("Tags")
-    # .withColumnRenamed("ParsedTags", "Tags")
+    .drop("Tags")
+    .withColumnRenamed("ParsedTags", "Tags")
 )
 
 # Write the DataFrame out to Parquet format

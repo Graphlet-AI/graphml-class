@@ -47,6 +47,7 @@ scikit-learn = "^1.5.2"
 graphrole = "^1.1.1"
 pyspark = "^3.5.3"
 graphframes-latest = "^0.8.3"
+py7zr = "^0.22.0"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

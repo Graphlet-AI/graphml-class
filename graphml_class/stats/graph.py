@@ -1,12 +1,10 @@
 #!/usr/bin/env pyspark --packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 --driver-memory 16g --executor-memory 8g
 
 import os
-import resource
 from typing import List
 
 import pandas as pd
 import pyspark.sql.functions as F
-from graphframes import GraphFrame
 from pyspark import SparkContext
 from pyspark.sql import DataFrame, SparkSession
 
@@ -15,7 +13,6 @@ os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"
 
 # Setup PySpark to use the GraphFrames jar package from maven central
 os.environ["PYSPARK_SUBMIT_ARGS"] = (
-    "--packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 pyspark-shell "
     "--driver-memory 4g pyspark-shell "
     "--executor-memory 4g pyspark-shell "
     "--driver-java-options='-Xmx4g -Xms4g' "
@@ -23,19 +20,6 @@ os.environ["PYSPARK_SUBMIT_ARGS"] = (
 
 # Show all the rows in a pd.DataFrame
 pd.set_option("display.max_columns", None)
-
-
-def get_memory_usage():
-    """Return the resident memory usage in GB."""
-    return (
-        resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
-        + resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss
-    ) / (1024 * 1024)
-
-
-def print_memory_usage():
-    """Print the resident memory usage in GB."""
-    print(f"Memory usage: {get_memory_usage():.2f} GB")
 
 
 #
@@ -115,7 +99,7 @@ print(f"Total Votes:     {votes_df.count():,}")
 tags_df: DataFrame = spark.read.parquet(
     "data/stats.meta.stackexchange.com/Tags.parquet"
 ).withColumn("Type", F.lit("Tag"))
-print(f"Total Tags: {tags_df.count():,}")
+print(f"Total Tags:      {tags_df.count():,}")
 
 #
 # Load the Badges...
@@ -123,7 +107,7 @@ print(f"Total Tags: {tags_df.count():,}")
 badges_df: DataFrame = spark.read.parquet(
     "data/stats.meta.stackexchange.com/Badges.parquet"
 ).withColumn("Type", F.lit("Badge"))
-print(f"Total Badges: {badges_df.count():,}\n")
+print(f"Total Badges:    {badges_df.count():,}\n")
 
 
 #
@@ -207,12 +191,6 @@ nodes_df.select("id", "Type").groupBy("Type").count().show()
 # Helps performance of GraphFrames' algorithms
 nodes_df: DataFrame = nodes_df.cache()
 
-#
-# Build the edges DataFrame: VotedFor, AskedBy, AnsweredBy.
-# Remember: 'src', 'dst' and 'relationship' are standard edge fields in GraphFrames
-# Remember: we must produce src/dst based on lowercase 'id' UUID, not 'Id' which is Stack Overflow's integer.
-#
-
 # Make sure we have the right columns and cached data
 posts_df: DataFrame = nodes_df.filter(nodes_df.Type == "Post")
 post_links_df: DataFrame = nodes_df.filter(nodes_df.Type == "PostLinks")
@@ -220,6 +198,7 @@ users_df: DataFrame = nodes_df.filter(nodes_df.Type == "User")
 votes_df: DataFrame = nodes_df.filter(nodes_df.Type == "Vote")
 tags_df: DataFrame = nodes_df.filter(nodes_df.Type == "Tag")
 badges_df: DataFrame = nodes_df.filter(nodes_df.Type == "Badge")
+
 
 #
 # Building blocks: separate the questions and answers
@@ -239,7 +218,25 @@ answers_df.select("ParentId", "Title", "Body").show(10)
 
 
 #
-# Create a [Vote]--VotedFor-->[Post] edge
+# Build the edges DataFrame:
+#
+# * [Vote]--CastFor-->[Post]
+# * [User]--Asks-->[Post]
+# * [User]--Answers-->[Post]
+# * [Post]--Answers-->[Post]
+# * [Tag]--Tags-->[Post]
+# * [User]--Earns-->[Badge]
+# * [Post]--Links-->[Post]
+#
+
+#
+# Remember: 'src', 'dst' and 'relationship' are standard edge fields in GraphFrames
+# Remember: we must produce src/dst based on lowercase 'id' UUID, not 'Id' which is Stack Overflow's integer.
+#
+
+
+#
+# Create a [Vote]--CastFor-->[Post] edge
 #
 src_vote_df: DataFrame = votes_df.select(
     F.col("id").alias("src"),
@@ -247,112 +244,125 @@ src_vote_df: DataFrame = votes_df.select(
     # Everything has all the fields - should build from base records but need UUIDs
     F.col("PostId").alias("VotePostId"),
 )
-voted_for_edge_df: DataFrame = (
-    src_vote_df.join(posts_df, src_vote_df.VotePostId == posts_df.Id)
-    .select(
-        # 'src' comes from the votes' 'id'
-        "src",
-        # 'dst' comes from the posts' 'id'
-        F.col("id").alias("dst"),
-        # All edges have a 'relationship' field
-        F.lit("VotedFor").alias("relationship"),
-    )
-    .cache()
+cast_for_edge_df: DataFrame = src_vote_df.join(
+    posts_df, src_vote_df.VotePostId == posts_df.Id
+).select(
+    # 'src' comes from the votes' 'id'
+    "src",
+    # 'dst' comes from the posts' 'id'
+    F.col("id").alias("dst"),
+    # All edges have a 'relationship' field
+    F.lit("CastFor").alias("relationship"),
 )
-print(f"Total VotedFor edges: {voted_for_edge_df.count():,}")
-print(f"Percentage of linked votes: {voted_for_edge_df.count() / votes_df.count():.2%}\n")
-
-#
-# Create a [User]--Cast-->[Vote] edge
-#
-# user_voted_df: DataFrame = users_df.select(
-#     F.col("id").alias("src"),
-#     F.col("Id").alias("UserId"),
-#     # Everything has all the fields - should build from base records but need UUIDs
-#     F.col("PostId").alias("VotePostId"),
-# )
-# user_voted_edge_df: DataFrame = (
-#     user_voted_df.join(votes_df, user_voted_df.UserId == votes_df.Id)
-#     .select(
-#         # 'src' comes from the votes' 'id'
-#         "src",
-#         # 'dst' comes from the posts' 'id'
-#         F.col("id").alias("dst"),
-#         # All edges have a 'relationship' field
-#         F.lit("Cast").alias("relationship"),
-#     )
-#     .cache()
-# )
-# print(f"Total VotedFor edges: {voted_for_edge_df.count():,}")
-# print(f"Percentage of linked votes: {voted_for_edge_df.count() / votes_df.count():.2%}\n")
+print(f"Total CastFor edges: {cast_for_edge_df.count():,}")
+print(f"Percentage of linked votes: {cast_for_edge_df.count() / votes_df.count():.2%}\n")
 
 
 #
-# Create a answer[User]--Answered-->question[Post] edge
+# Create a [User]--Asks-->[Post] edge
 #
-asked_edges_df: DataFrame = questions_df.select(
+user_asks_edges_df: DataFrame = questions_df.select(
     F.col("OwnerUserId").alias("src"),
     F.col("id").alias("dst"),
-    F.lit("Asked").alias("relationship"),
+    F.lit("Asks").alias("relationship"),
 )
-print(f"\nTotal Asked edges: {asked_edges_df.count():,}\n")
+print(f"Total Asks edges: {user_asks_edges_df.count():,}")
 print(
-    f"Percentage of asked questions linked to users: {asked_edges_df.count() / questions_df.count():.2%}\n"
+    f"Percentage of asked questions linked to users: {user_asks_edges_df.count() / questions_df.count():.2%}\n"
 )
 
+user_answers_edges_df: DataFrame = answers_df.select(
+    F.col("OwnerUserId").alias("src"),
+    F.col("id").alias("dst"),
+    F.lit("Answers").alias("relationship"),
+)
+print(f"Total User Answers edges: {user_answers_edges_df.count():,}")
+print(
+    f"Percentage of asked questions linked to users: {user_answers_edges_df.count() / answers_df.count():.2%}\n"
+)
+
+
 #
-# Create a answer[Post]--Answers-->question[Post] edge
+# Create a [Post, answer]--Answers-->[Post, question] edge
 #
 src_answers_df: DataFrame = answers_df.select(
     F.col("id").alias("src"),
     F.col("Id").alias("AnswerId"),
     F.col("ParentId").alias("AnswerParentId"),
 )
-answered_edges_df: DataFrame = (
-    src_answers_df.join(posts_df, src_answers_df.AnswerParentId == posts_df.Id)
-    .select(
-        # 'src' comes from the answers' 'id'
-        "src",
-        # 'dst' comes from the posts' 'id'
-        F.col("id").alias("dst"),
-        # All edges have a 'relationship' field
-        F.lit("Answers").alias("relationship"),
-    )
-    .cache()
-)
-print(f"\nTotal Answered edges: {answered_edges_df.count():,}\n")
-print(f"Percentage of linked answers: {answered_edges_df.count() / answers_df.count():.2%}\n")
-
-
-#
-# Create a [User]--Posted-->[Post] edge
-#
-src_posts_df: DataFrame = posts_df.select(
+post_answers_edges_df: DataFrame = src_answers_df.join(
+    posts_df, src_answers_df.AnswerParentId == posts_df.Id
+).select(
+    # 'src' comes from the answers' 'id'
+    "src",
+    # 'dst' comes from the posts' 'id'
     F.col("id").alias("dst"),
-    F.col("Id").alias("PostPostId"),
-    F.col("OwnerUserId").alias("PostOwnerUserId"),
+    # All edges have a 'relationship' field
+    F.lit("Answers").alias("relationship"),
+)
+print(f"Total Posts Answers edges: {post_answers_edges_df.count():,}")
+print(f"Percentage of linked answers: {post_answers_edges_df.count() / answers_df.count():.2%}\n")
+
+
+#
+# Create a [Tag]--Tags-->[Post] edge
+#
+src_tags_df: DataFrame = posts_df.select(
+    F.col("id").alias("dst"),
+    # First remove leading/trailing < and >, then split on "><"
+    F.explode("Tags").alias("Tag"),
+)
+tags_edge_df: DataFrame = src_tags_df.join(tags_df, src_tags_df.Tag == tags_df.TagName).select(
+    # 'src' comes from the posts' 'id'
+    "dst",
+    # 'dst' comes from the tags' 'id'
+    F.col("id").alias("src"),
+    # All edges have a 'relationship' field
+    F.lit("Tags").alias("relationship"),
 )
 
-posted_edge_df: DataFrame = (
-    src_posts_df.join(users_df, src_posts_df.PostOwnerUserId == users_df.Id)
-    .select(
-        # 'src' comes from the posts' 'id'
-        F.col("id").alias("src"),
-        # 'dst' comes from the users' 'id'
-        "dst",
-        # All edges have a 'relationship' field
-        F.lit("Posted").alias("relationship"),
-    )
-    .cache()
+
+#
+# Create a [User]--Earns-->[Badge] edge
+#
+earns_edges_df: DataFrame = badges_df.select(
+    F.col("UserId").alias("src"),
+    F.col("id").alias("dst"),
+    F.lit("Earns").alias("relationship"),
 )
-print(f"Total Posted edges: {posted_edge_df.count():,}")
-print(f"Percentage of linked posts: {posted_edge_df.count() / posts_df.count():.2%}\n")
+
+#
+# Create a [Post]--Links-->[Post] edge
+#
+trim_links_df: DataFrame = post_links_df.select(
+    F.col("PostId").alias("SrcPostId"), F.col("RelatedPostId").alias("DstPostId")
+)
+links_src_edge_df: DataFrame = trim_links_df.join(
+    posts_df, trim_links_df.SrcPostId == posts_df.Id
+).select(
+    # 'dst' comes from the posts' 'id'
+    F.col("id").alias("src"),
+    "DstPostId",
+)
+links_edge_df = links_src_edge_df.join(posts_df, links_src_edge_df.DstPostId == posts_df.Id).select(
+    "src",
+    # 'src' comes from the posts' 'id'
+    F.col("id").alias("dst"),
+    # All edges have a 'relationship' field
+    F.lit("Links").alias("relationship"),
+)
+
 
 #
 # Combine all the edges together into one relationships DataFrame
 #
 relationships_df: DataFrame = (
-    voted_for_edge_df.union(asked_edges_df).union(answered_edges_df).union(posted_edge_df)
+    cast_for_edge_df.unionByName(user_asks_edges_df)
+    .unionByName(user_answers_edges_df)
+    .unionByName(post_answers_edges_df)
+    .unionByName(tags_edge_df)
+    .unionByName(earns_edges_df)
+    .unionByName(links_edge_df)
 )
 
 relationships_df.groupBy("relationship").count().show()
@@ -360,66 +370,15 @@ relationships_df.groupBy("relationship").count().show()
 # +------------+------+
 # |relationship|count |
 # +------------+------+
-# |    VotedFor|39,994|
-# |       Asked| 1,994|
-# |     Answers| 2,936|
-# |      Posted| 4,628|
+# |     CastFor|40,701|
+# |        Asks| 2,025|
+# |     Answers| 2,978|
+# |        Tags| 4,427|
+# |       Earns|43,029|
+# |       Links| 1,268|
 # +------------+------+
 
 EDGES_PATH: str = "data/stats.meta.stackexchange.com/Edges.parquet"
 
 # Write to disk and back again
 relationships_df.write.mode("overwrite").parquet(EDGES_PATH)
-relationships_df: DataFrame = spark.read.parquet(EDGES_PATH)
-
-# Helps performance of GraphFrames' algorithms
-relationships_df: DataFrame = relationships_df.cache()
-
-
-#
-# Create the GraphFrame
-#
-g = GraphFrame(nodes_df, relationships_df)
-
-g.vertices.show()
-g.edges.show()
-
-# Test out Connected Components
-sc.setCheckpointDir("/tmp/spark-checkpoints")
-components = g.connectedComponents()
-components.select("id", "component").groupBy("component").count().sort(F.desc("count")).show()
-
-# Shows (User)-[VotedFor]->(Post)--(Answers)->(Post)
-paths = g.find("(a)-[e]->(b); (b)-[e2]->(c)")
-paths.select("a.Type", "e.*", "b.Type", "e2.*", "c.Type").show()
-
-# Shows two matches:
-# - (Post)-[Answers]->(Post)<--[Posted]-(User)
-# - (Post)-[Answers]->(Post)<--[VotedFor]-(User)
-paths = g.find("(a)-[e]->(b); (c)-[e2]->(a)")
-paths.select("a.Type", "e.*", "b.Type", "e2.*", "c.Type").show()
-
-# Figure out how often questions are answered and the question poster votes for the answer. Neat!
-# Shows (User A)-[Posted]->(Post)<-[Answers]-(Post)<-[VotedFor]-(User)
-paths = g.find("(a)-[e]->(b); (c)-[e2]->(b); (d)-[e3]->(c)")
-
-# If the node types are right...
-paths = paths.filter(F.col("a.Type") == "User")
-paths = paths.filter(F.col("b.Type") == "Post")
-paths = paths.filter(F.col("c.Type") == "Post")
-paths = paths.filter(F.col("d.Type") == "User")
-
-# If the edge types are right...
-# paths = paths.filter(F.col("e.relationship") == "Posted")
-# paths = paths.filter(F.col("e2.relationship") == "Answers")
-paths = paths.filter(F.col("e3.relationship") == "VotedFor")
-
-paths.select(
-    "a.Type",
-    "e.relationship",
-    "b.Type",
-    "e2.relationship",
-    "c.Type",
-    "e3.relationship",
-    "d.Type",
-).show()

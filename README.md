@@ -33,7 +33,7 @@ NOTE: older versions of docker may use the command `docker-compose` rather than 
 
 ## VSCode Setup
 
-To edit code in VSCode you may want a local Anaconda Python environment with the class's PyPi libraries installed. 
+To edit code in VSCode you may want a local Anaconda Python environment with the class's PyPi libraries installed.
 This will enable VSCode to parse the code, understand APIs and highlight errors.
 
 Note: if you do not use Anaconda, consider using it :) You can use a Python 3 [venv](https://docs.python.org/3/library/venv.html) in the same way as `conda`.
@@ -43,7 +43,7 @@ Note: if you do not use Anaconda, consider using it :) You can use a Python 3 [v
 Create a new Anaconda environment:
 
 ```bash
-conda create -n graphml python=3.10 -y
+conda create -n graphml python=3.10.11 -y
 ```
 
 Activate the environment:
@@ -71,3 +71,5 @@ to bring up a command search window. Now type `Python` or `Interpreter` or if yo
 ```bash
 Python 3.10.11 ('graphml') /opt/anaconda3/envs/graphml/bin/python
 ```
+
+Note: the Python version is set to `3.10.11` because Jupyter Stacks have not been updated more recently.

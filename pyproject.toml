@@ -23,7 +23,7 @@ networkx = ">=3.1"
 numpy = "^1.24.3"
 pandas = "<2.0"
 requests = "^2.31.0"
-seaborn = "^0.12.2"
+seaborn = "^0.13.2"
 torch = [
     {"platform" = "linux", "url" = "https://files.pythonhosted.org/packages/81/58/431fd405855553af1a98091848cf97741302416b01462bbf9909d3c422b3/torch-1.13.1-cp310-cp310-manylinux1_x86_64.whl" },
     {"platform" = "darwin", "url" = "https://files.pythonhosted.org/packages/82/d8/0547f8a22a0c8aeb7e7e5e321892f1dcf93ea021829a99f1a25f1f535871/torch-1.13.1-cp310-none-macosx_10_9_x86_64.whl" },
@@ -48,6 +48,7 @@ graphrole = "^1.1.1"
 pyspark = "^3.5.3"
 graphframes-latest = "^0.8.3"
 py7zr = "^0.22.0"
+sentence-transformers = "^3.3.1"
 
 [tool.poetry.group.dev.dependencies]
 nbdime = "^3.2.1"

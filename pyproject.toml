@@ -17,7 +17,7 @@ packages = [{include = "graphml_class"}]
 [tool.poetry.dependencies]
 python = ">=3.10,<3.13"
 python-dateutil = "^2.8.2"
-graphistry = {extras = ["ai"], version = "^0.34.17"}
+graphistry = "^0.34.17"
 littleballoffur = "^2.3.1"
 networkx = ">=3.1"
 numpy = "^1.24.3"

@@ -1,4 +1,4 @@
-#!/usr/bin/env pyspark --packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 --driver-memory 16g --executor-memory 8g
+#!/usr/bin/env pyspark --packages graphframes:graphframes:0.8.3-spark3.5-s_2.12 --driver-memory 4g --executor-memory 4g
 
 import os
 from typing import List
@@ -192,12 +192,12 @@ nodes_df.select("id", "Type").groupBy("Type").count().show()
 nodes_df: DataFrame = nodes_df.cache()
 
 # Make sure we have the right columns and cached data
-posts_df: DataFrame = nodes_df.filter(nodes_df.Type == "Post")
-post_links_df: DataFrame = nodes_df.filter(nodes_df.Type == "PostLinks")
-users_df: DataFrame = nodes_df.filter(nodes_df.Type == "User")
-votes_df: DataFrame = nodes_df.filter(nodes_df.Type == "Vote")
-tags_df: DataFrame = nodes_df.filter(nodes_df.Type == "Tag")
-badges_df: DataFrame = nodes_df.filter(nodes_df.Type == "Badge")
+posts_df: DataFrame = nodes_df.filter(nodes_df.Type == "Post").cache()
+post_links_df: DataFrame = nodes_df.filter(nodes_df.Type == "PostLinks").cache()
+users_df: DataFrame = nodes_df.filter(nodes_df.Type == "User").cache()
+votes_df: DataFrame = nodes_df.filter(nodes_df.Type == "Vote").cache()
+tags_df: DataFrame = nodes_df.filter(nodes_df.Type == "Tag").cache()
+badges_df: DataFrame = nodes_df.filter(nodes_df.Type == "Badge").cache()
 
 
 #
@@ -205,13 +205,13 @@ badges_df: DataFrame = nodes_df.filter(nodes_df.Type == "Badge")
 #
 
 # Do the questions look ok? Questions have NO parent ID and DO have a Title
-questions_df: DataFrame = posts_df[posts_df.ParentId.isNull()]
+questions_df: DataFrame = posts_df[posts_df.ParentId.isNull()].cache()
 print(f"\nTotal questions: {questions_df.count():,}\n")
 
 questions_df.select("ParentId", "Title", "Body").show(10)
 
 # Answers DO have a ParentId parent post and no Title
-answers_df: DataFrame = posts_df[posts_df.ParentId.isNotNull()]
+answers_df: DataFrame = posts_df[posts_df.ParentId.isNotNull()].cache()
 print(f"\nTotal answers: {answers_df.count():,}\n")
 
 answers_df.select("ParentId", "Title", "Body").show(10)
@@ -320,6 +320,8 @@ tags_edge_df: DataFrame = src_tags_df.join(tags_df, src_tags_df.Tag == tags_df.T
     # All edges have a 'relationship' field
     F.lit("Tags").alias("relationship"),
 )
+print(f"Total Tags edges: {tags_edge_df.count():,}")
+print(f"Percentage of linked tags: {tags_edge_df.count() / posts_df.count():.2%}\n")
 
 
 #
@@ -330,6 +332,8 @@ earns_edges_df: DataFrame = badges_df.select(
     F.col("id").alias("dst"),
     F.lit("Earns").alias("relationship"),
 )
+print(f"Total Earns edges: {earns_edges_df.count():,}")
+print(f"Percentage of earned badges: {earns_edges_df.count() / badges_df.count():.2%}\n")
 
 #
 # Create a [Post]--Links-->[Post] edge
@@ -351,6 +355,8 @@ links_edge_df = links_src_edge_df.join(posts_df, links_src_edge_df.DstPostId == 
     # All edges have a 'relationship' field
     F.lit("Links").alias("relationship"),
 )
+print(f"Total Links edges: {links_edge_df.count():,}")
+print(f"Percentage of linked posts: {links_edge_df.count() / post_links_df.count():.2%}\n")
 
 
 #

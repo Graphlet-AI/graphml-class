@@ -1,4 +1,5 @@
 # Convert some Stack Exchange XML files to Parquet format
+
 #
 # Usage: pyspark --packages com.databricks:spark-xml_2.12:0.18.0
 #
@@ -15,9 +16,9 @@ from pyspark.sql import DataFrame, SparkSession
 # This is actually already set in Docker, just reminding you Java is needed
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"
 
-# Setup PySpark to use the GraphFrames jar package from maven central
+# This doesn't work from here, you have to do this from the CLI via pyspark or spark-submit
 os.environ["PYSPARK_SUBMIT_ARGS"] = (
-    "--packages com.databricks:spark-xml_2.12:0.18.0 pyspark-shell "
+    "--packages com.databricks:spark-xml_2.12:0.18.0"
     "--driver-memory 4g pyspark-shell "
     "--executor-memory 4g pyspark-shell "
     "--driver-java-options='-Xmx4g -Xms4g' "
@@ -46,7 +47,7 @@ def remove_prefix(df: DataFrame) -> DataFrame:
 
 
 @F.udf(returnType=T.ArrayType(T.StringType()))
-def split_tags(tags: str) -> list[str]:
+def split_tags(tags: str) -> List[str]:
     if not tags:
         return []
     # Remove < and > and split into array

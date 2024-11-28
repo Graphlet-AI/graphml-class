@@ -1,4 +1,4 @@
-# Graph Machine Learning: Theory, Practice, Tools and Techniques
+# Full Stack Graph Machine Learning: Theory, Practice, Tools and Techniques v1.1.1
 
 This is a course from Graphlet AI on full-stack graph machine learning taught by Russell Jurney.
 

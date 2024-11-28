@@ -6,10 +6,10 @@ This is a course from Graphlet AI on full-stack graph machine learning taught by
 
 ## Environment Setup
 
-This project uses Docker image [rjurney/graphml-class](https://hub.docker.com/repository/docker/rjurney/graphml-class/general). To bring it up as the `jupyter` service along with `neo4j`, run:
+This class uses a Docker image [rjurney/graphml-class](https://hub.docker.com/repository/docker/rjurney/graphml-class/general). To bring it up as the `jupyter` service along with `neo4j`, run:
 
 ```bash
-# Pull the Docker images
+# Pull the Docker images BEFORE class starts, or it can take a while on a shared connection
 docker compose pull
 
 # Run a Jupyter Notebook container in the background with all requirements.txt installed
@@ -73,3 +73,9 @@ Python 3.10.11 ('graphml') /opt/anaconda3/envs/graphml/bin/python
 ```
 
 Note: the Python version is set to `3.10.11` because Jupyter Stacks have not been updated more recently.
+
+## Network Motifs
+
+This course now covers network motifs in pyspark / [GraphFrames](https://graphframes.github.io/graphframes/docs/_site/index.html). It supports directed motifs, not undirected. All the 4-node motifs are outlined below. Note that GraphFrames can also filter the paths returned by its `f.find()` method using any Spark `DataFrame` filter - enabling temporal and complex property graph motifs.
+
+<center><img src="images/illustration-of-directed-graphlets-a-The-40-two-to-four-node-directed-graphlets-G0.png" alt="All 4-node directed network motifs"></center>

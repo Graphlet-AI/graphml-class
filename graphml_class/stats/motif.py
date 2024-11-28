@@ -83,11 +83,13 @@ g.edges.show()
 
 # Test out Connected Components - fun!
 sc.setCheckpointDir("/tmp/spark-checkpoints")
+
+# This is the top used algorithm in GraphFrames - really useful for big data entity resolution!
 components = g.connectedComponents()
 components.select("id", "component").groupBy("component").count().sort(F.desc("count")).show()
 
 # Shows (User)-[VotedFor]->(Post)--(Answers)->(Post)
-paths = g.find("(a)-[e]->(b); (b)-[e2]->(c)")
+paths = g.find("(a)-[e]->(b); (b)-[e2]->(c); (c)-[e3]->(a)")
 paths.select("a.Type", "e.*", "b.Type", "e2.*", "c.Type").show()
 
 # Shows two matches:

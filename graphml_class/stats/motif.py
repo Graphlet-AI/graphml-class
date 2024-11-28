@@ -8,6 +8,79 @@ from graphframes import GraphFrame
 from pyspark import SparkContext
 from pyspark.sql import DataFrame, SparkSession
 
+
+def three_edge_count(paths: DataFrame) -> DataFrame:
+    """three_edge_count View the counts of the different types of 3-node graphlets in the graph.
+
+    Parameters
+    ----------
+    paths : pyspark.sql.DataFrame
+        A DataFrame of 3-paths in the graph.
+
+    Returns
+    -------
+    DataFrame
+        A DataFrame of the counts of the different types of 3-node graphlets in the graph.
+    """
+    graphlet_type_df = paths.select(
+        F.col("a.Type").alias("A_Type"),
+        F.col("e.relationship").alias("E_relationship"),
+        F.col("b.Type").alias("B_Type"),
+        F.col("e2.relationship").alias("E2_relationship"),
+        F.col("c.Type").alias("C_Type"),
+        F.col("e3.relationship").alias("E3_relationship"),
+    )
+    graphlet_count_df = (
+        graphlet_type_df.groupby(
+            "A_Type", "E_relationship", "B_Type", "E2_relationship", "C_Type", "E3_relationship"
+        )
+        .count()
+        .orderBy(F.col("count").desc())
+    )
+    return graphlet_count_df
+
+
+def four_edge_count(paths: DataFrame) -> DataFrame:
+    """four_edge_count View the counts of the different types of 4-node graphlets in the graph.
+
+    Parameters
+    ----------
+    paths : DataFrame
+        A DataFrame of 4-paths in the graph.
+
+    Returns
+    -------
+    DataFrame
+        A DataFrame of the counts of the different types of 4-node graphlets in the graph.
+    """
+
+    graphlet_type_df = paths.select(
+        F.col("a.Type").alias("A_Type"),
+        F.col("e.relationship").alias("E_relationship"),
+        F.col("b.Type").alias("B_Type"),
+        F.col("e2.relationship").alias("E2_relationship"),
+        F.col("c.Type").alias("C_Type"),
+        F.col("e3.relationship").alias("E3_relationship"),
+        F.col("d.Type").alias("D_Type"),
+        F.col("e4.relationship").alias("E4_relationship"),
+    )
+    graphlet_count_df = (
+        graphlet_type_df.groupby(
+            "A_Type",
+            "E_relationship",
+            "B_Type",
+            "E2_relationship",
+            "C_Type",
+            "E3_relationship",
+            "D_Type",
+            "E4_relationship",
+        )
+        .count()
+        .orderBy(F.col("count").desc())
+    )
+    return graphlet_count_df
+
+
 # This is actually already set in Docker, just reminding you Java is needed
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"
 
@@ -88,9 +161,26 @@ sc.setCheckpointDir("/tmp/spark-checkpoints")
 components = g.connectedComponents()
 components.select("id", "component").groupBy("component").count().sort(F.desc("count")).show()
 
-# Shows (User)-[VotedFor]->(Post)--(Answers)->(Post)
+# G4: Continuous Triangles
 paths = g.find("(a)-[e]->(b); (b)-[e2]->(c); (c)-[e3]->(a)")
-paths.select("a.Type", "e.*", "b.Type", "e2.*", "c.Type").show()
+three_edge_count(paths).show()
+
+# G5: Divergent Triangles
+paths = g.find("(a)-[e]->(b); (a)-[e2]->(c); (c)-[e3]->(b)")
+three_edge_count(paths).show()
+
+# G6: Continuous Path
+paths = g.find("(a)-[e]->(b); (b)-[e2]->(c); (c)-[e3]->(d)")
+three_edge_count(paths).show()
+
+# G10: Convergent Triangle
+paths = g.find("(a)-[e]->(b); (c)-[e2]->(a); (d)-[e3]->(a)")
+three_edge_count(paths).show()
+
+# G14: Cyclic Quadrilaterals
+paths = g.find("(a)-[e]->(b); (b)-[e2]->(c); (c)-[e3]->(d); (d)-[e4]->(a)")
+four_edge_count(paths).show()
+
 
 # Shows two matches:
 # - (Post)-[Answers]->(Post)<--[Posted]-(User)

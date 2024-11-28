@@ -108,6 +108,23 @@ votes_df = (
 # Remove the _ prefix from field names
 votes_df = remove_prefix(votes_df)
 
+# Add a VoteType column
+votes_df = votes_df.withColumn(
+    "VoteType",
+    F.when(F.col("VoteTypeId") == 2, "UpVote")
+    .when(F.col("VoteTypeId") == 3, "DownVote")
+    .when(F.col("VoteTypeId") == 4, "Favorite")
+    .when(F.col("VoteTypeId") == 5, "Close")
+    .when(F.col("VoteTypeId") == 6, "Reopen")
+    .when(F.col("VoteTypeId") == 7, "BountyStart")
+    .when(F.col("VoteTypeId") == 8, "BountyClose")
+    .when(F.col("VoteTypeId") == 9, "Deletion")
+    .when(F.col("VoteTypeId") == 10, "Undeletion")
+    .when(F.col("VoteTypeId") == 11, "Spam")
+    .when(F.col("VoteTypeId") == 12, "InformModerator")
+    .otherwise("Unknown"),
+)
+
 # Write the DataFrame out to Parquet format
 votes_df.repartition(1).write.mode("overwrite").parquet(
     "data/stats.meta.stackexchange.com/Votes.parquet"

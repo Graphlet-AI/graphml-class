@@ -5,3 +5,5 @@ data
 logs/neo4j
 logs
 __pycache__
+derby.log
+metastore_db

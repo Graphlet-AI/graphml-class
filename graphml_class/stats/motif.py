@@ -220,6 +220,64 @@ graphlet_count_df.show()
 paths = g.find("(a)-[e]->(b); (c)-[e2]->(a); (d)-[e3]->(a)")
 three_edge_count(paths).show()
 
+# G10: Convergent Triangle with VoteTypes
+paths = g.find("(a)-[e]->(b); (c)-[e2]->(a); (d)-[e3]->(a)")
+graphlet_type_df = paths.select(
+    F.col("a.Type").alias("A_Type"),
+    F.col("e.relationship").alias("E_relationship"),
+    F.col("b.Type").alias("B_Type"),
+    F.col("e2.relationship").alias("E2_relationship"),
+    F.col("c.Type").alias("C_Type"),
+    F.col("c.VoteType").alias("C_VoteType"),
+    F.col("e3.relationship").alias("E3_relationship"),
+    F.col("d.Type").alias("D_Type"),
+    F.col("d.VoteType").alias("D_VoteType"),
+)
+graphlet_count_df = (
+    graphlet_type_df.groupby(
+        "A_Type",
+        "E_relationship",
+        "B_Type",
+        "E2_relationship",
+        "C_Type",
+        "C_VoteType",
+        "E3_relationship",
+        "D_Type",
+        "D_VoteType",
+    )
+    .count()
+    .filter(F.col("C_Type") == "Vote")
+    .filter(F.col("E3_relationship") == "CastFor")
+    .orderBy(F.col("count").desc())
+)
+graphlet_count_df.show()
+
+# +------+--------------+------+---------------+------+----------+---------------+------+----------+------+
+# |A_Type|E_relationship|B_Type|E2_relationship|C_Type|C_VoteType|E3_relationship|D_Type|D_VoteType| count|
+# +------+--------------+------+---------------+------+----------+---------------+------+----------+------+
+# |  Post|       Answers|  Post|        CastFor|  Vote|    UpVote|        CastFor|  Vote|    UpVote|313807|
+# |  Post|         Links|  Post|        CastFor|  Vote|    UpVote|        CastFor|  Vote|    UpVote|271944|
+# |  Post|       Answers|  Post|        CastFor|  Vote|    UpVote|        CastFor|  Vote|   Unknown|  8159|
+# |  Post|       Answers|  Post|        CastFor|  Vote|   Unknown|        CastFor|  Vote|    UpVote|  8159|
+# |  Post|         Links|  Post|        CastFor|  Vote|    UpVote|        CastFor|  Vote|  DownVote|  6749|
+# |  Post|         Links|  Post|        CastFor|  Vote|  DownVote|        CastFor|  Vote|    UpVote|  6749|
+# |  Post|       Answers|  Post|        CastFor|  Vote|  DownVote|        CastFor|  Vote|    UpVote|  6586|
+# |  Post|       Answers|  Post|        CastFor|  Vote|    UpVote|        CastFor|  Vote|  DownVote|  6586|
+# |  Post|         Links|  Post|        CastFor|  Vote|  DownVote|        CastFor|  Vote|  DownVote|  4266|
+# |  Post|       Answers|  Post|        CastFor|  Vote|  DownVote|        CastFor|  Vote|  DownVote|  4190|
+# |  Post|         Links|  Post|        CastFor|  Vote|    UpVote|        CastFor|  Vote|   Unknown|  1617|
+# |  Post|         Links|  Post|        CastFor|  Vote|   Unknown|        CastFor|  Vote|    UpVote|  1617|
+# |  Post|       Answers|  Post|        CastFor|  Vote|   Unknown|        CastFor|  Vote|   Unknown|   919|
+# |  Post|         Links|  Post|        CastFor|  Vote|   Unknown|        CastFor|  Vote|  DownVote|   317|
+# |  Post|         Links|  Post|        CastFor|  Vote|  DownVote|        CastFor|  Vote|   Unknown|   317|
+# |  Post|         Links|  Post|        CastFor|  Vote|   Unknown|        CastFor|  Vote|   Unknown|   239|
+# |  Post|       Answers|  Post|        CastFor|  Vote|   Unknown|        CastFor|  Vote|  DownVote|   113|
+# |  Post|       Answers|  Post|        CastFor|  Vote|  DownVote|        CastFor|  Vote|   Unknown|   113|
+# |  Post|       Answers|  Post|        CastFor|  Vote|    UpVote|        CastFor|  Vote|      Spam|    92|
+# |  Post|       Answers|  Post|        CastFor|  Vote|      Spam|        CastFor|  Vote|    UpVote|    92|
+# +------+--------------+------+---------------+------+----------+---------------+------+----------+------+
+# only showing top 20 rows
+
 # G14: Cyclic Quadrilaterals
 paths = g.find("(a)-[e]->(b); (b)-[e2]->(c); (c)-[e3]->(d); (d)-[e4]->(a)")
 four_edge_count(paths).show()

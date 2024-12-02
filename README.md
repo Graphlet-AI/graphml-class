@@ -2,7 +2,7 @@
 
 This is a course from Graphlet AI on full-stack graph machine learning taught by Russell Jurney.
 
-<center><img src="images/Graphlet-AI-Banner-with-Hypergraph-and-Womans-Head.jpg" /></center>
+<center><img src="images/Graphlet-AI-Banner-with-Hypergraph-and-Womans-Head.jpg" alt="Graphlet AI" /></center>
 
 ## Environment Setup
 
@@ -62,7 +62,7 @@ poetry install
 
 You can use a [Python environment](https://code.visualstudio.com/docs/python/environments) in VSCode by typing:
 
-```
+```txt
 SHIFT-CMD-P
 ```
 
@@ -76,6 +76,8 @@ Note: the Python version is set to `3.10.11` because Jupyter Stacks have not bee
 
 ## Network Motifs
 
-This course now covers network motifs in pyspark / [GraphFrames](https://graphframes.github.io/graphframes/docs/_site/index.html). It supports directed motifs, not undirected. All the 4-node motifs are outlined below. Note that GraphFrames can also filter the paths returned by its `f.find()` method using any Spark `DataFrame` filter - enabling temporal and complex property graph motifs.
+This course now covers network motifs in pyspark / [GraphFrames](https://graphframes.github.io/graphframes/docs/_site/index.html).
+It supports directed motifs, not undirected. All the 4-node motifs are outlined below. Note that GraphFrames can also filter the
+paths returned by its `f.find()` method using any Spark `DataFrame` filter - enabling temporal and complex property graph motifs.
 
 <center><img src="images/illustration-of-directed-graphlets-a-The-40-two-to-four-node-directed-graphlets-G0.png" alt="All 4-node directed network motifs"></center>

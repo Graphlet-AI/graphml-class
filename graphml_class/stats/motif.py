@@ -173,6 +173,49 @@ three_edge_count(paths).show()
 paths = g.find("(a)-[e]->(b); (b)-[e2]->(c); (c)-[e3]->(d)")
 three_edge_count(paths).show()
 
+# G6: Continuous Path Votes with VoteTypes
+graphlet_type_df = paths.select(
+    F.col("a.Type").alias("A_Type"),
+    F.col("a.VoteType").alias("A_VoteType"),
+    F.col("e.relationship").alias("E_relationship"),
+    F.col("b.Type").alias("B_Type"),
+    F.col("e2.relationship").alias("E2_relationship"),
+    F.col("c.Type").alias("C_Type"),
+    F.col("e3.relationship").alias("E3_relationship"),
+)
+graphlet_count_df = (
+    graphlet_type_df.groupby(
+        "A_Type",
+        "A_VoteType",
+        "E_relationship",
+        "B_Type",
+        "E2_relationship",
+        "C_Type",
+        "E3_relationship",
+    )
+    .count()
+    .filter(F.col("A_Type") == "Vote")
+    .orderBy(F.col("count").desc())
+)
+graphlet_count_df.show()
+
+# +------+----------+--------------+------+---------------+------+---------------+-----+
+# |A_Type|A_VoteType|E_relationship|B_Type|E2_relationship|C_Type|E3_relationship|count|
+# +------+----------+--------------+------+---------------+------+---------------+-----+
+# |  Vote|    UpVote|       CastFor|  Post|        Answers|  Post|          Links|27197|
+# |  Vote|    UpVote|       CastFor|  Post|          Links|  Post|          Links|22947|
+# |  Vote|  DownVote|       CastFor|  Post|        Answers|  Post|          Links| 2129|
+# |  Vote|  DownVote|       CastFor|  Post|          Links|  Post|          Links| 1503|
+# |  Vote|   Unknown|       CastFor|  Post|        Answers|  Post|          Links|  523|
+# |  Vote|   Unknown|       CastFor|  Post|          Links|  Post|          Links|  165|
+# |  Vote|      Spam|       CastFor|  Post|          Links|  Post|          Links|   18|
+# |  Vote|    UpVote|       CastFor|  Post|          Links|  Post|        Answers|   17|
+# |  Vote|      Spam|       CastFor|  Post|        Answers|  Post|          Links|   16|
+# |  Vote|Undeletion|       CastFor|  Post|        Answers|  Post|          Links|    1|
+# |  Vote|   Unknown|       CastFor|  Post|          Links|  Post|        Answers|    1|
+# |  Vote|    Reopen|       CastFor|  Post|          Links|  Post|          Links|    1|
+# +------+----------+--------------+------+---------------+------+---------------+-----+
+
 # G10: Convergent Triangle
 paths = g.find("(a)-[e]->(b); (c)-[e2]->(a); (d)-[e3]->(a)")
 three_edge_count(paths).show()

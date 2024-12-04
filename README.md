@@ -76,7 +76,7 @@ Note: the Python version is set to `3.10.11` because Jupyter Stacks have not bee
 
 ## Network Motifs
 
-This course now covers network motifs in pyspark / [GraphFrames](https://graphframes.github.io/graphframes/docs/_site/index.html).
+This course now covers [network motifs](https://www.sciencedirect.com/topics/biochemistry-genetics-and-molecular-biology/network-motif#:~:text=A%20network%20motif%20is%20a,multiple%20times%20within%20a%20network.) in property graphs (frequent patterns of structure) using pyspark / [GraphFrames](https://graphframes.github.io/graphframes/docs/_site/index.html) (see [motif.py](https://github.com/Graphlet-AI/graphml-class/blob/main/graphml_class/stats/motif.py), no notebook yet).
 It supports directed motifs, not undirected. All the 4-node motifs are outlined below. Note that GraphFrames can also filter the
 paths returned by its `f.find()` method using any Spark `DataFrame` filter - enabling temporal and complex property graph motifs.
 

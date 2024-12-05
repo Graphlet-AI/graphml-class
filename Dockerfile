@@ -1,5 +1,5 @@
 # Start from a Jupyter Docker Stacks version
-FROM jupyter/scipy-notebook:python-3.10.11
+FROM quay.io/jupyter/scipy-notebook:python-3.11
 
 # Makes littleballoffur skip networkit build
 ENV READTHEDOCS=true

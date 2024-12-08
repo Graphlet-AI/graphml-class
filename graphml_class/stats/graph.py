@@ -12,11 +12,7 @@ from pyspark.sql import DataFrame, SparkSession
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"
 
 # Setup PySpark to use the GraphFrames jar package from maven central
-os.environ["PYSPARK_SUBMIT_ARGS"] = (
-    "--driver-memory 4g pyspark-shell "
-    "--executor-memory 4g pyspark-shell "
-    "--driver-java-options='-Xmx4g -Xms4g' "
-)
+os.environ["PYSPARK_SUBMIT_ARGS"] = "--driver-memory 4g --executor-memory 4g"
 
 # Show all the rows in a pd.DataFrame
 pd.set_option("display.max_columns", None)
@@ -43,8 +39,8 @@ spark: SparkSession = (
     # Lets the Id:(Stack Overflow int) and id:(GraphFrames ULID) coexist
     .config("spark.sql.caseSensitive", True)
     # Single node mode - 128GB machine
-    .config("spark.driver.memory", "16g")
-    .config("spark.executor.memory", "8g")
+    .config("spark.driver.memory", "4g")
+    .config("spark.executor.memory", "4g")
     .getOrCreate()
 )
 sc: SparkContext = spark.sparkContext
@@ -388,3 +384,6 @@ EDGES_PATH: str = "data/stats.meta.stackexchange.com/Edges.parquet"
 
 # Write to disk and back again
 relationships_df.write.mode("overwrite").parquet(EDGES_PATH)
+
+spark.stop()
+print("Spark stopped.")

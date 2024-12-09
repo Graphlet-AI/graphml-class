@@ -59,10 +59,10 @@ nbdime = "^4.0.2"
 pytest = "^7.4.2"
 pytest-stub = "^1.1.0"
 
-[[tool.poetry.source]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-priority = "explicit"
+# [[tool.poetry.source]]
+# name = "pytorch-cpu"
+# url = "https://download.pytorch.org/whl/cpu"
+# priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]

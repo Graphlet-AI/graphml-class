@@ -40,11 +40,10 @@ requests = "^2.31.0"
 seaborn = "^0.13.2"
 scikit-learn = "^1.5.2"
 sentence-transformers = "^3.3.1"
-# torch = [
-#    # {platform = "linux", version = "^2.5.1", source = "pytorch-cpu"},
-#     {platform = "darwin", version = "*"}
-# ]
-torch = "^2.5.1"
+torch = [
+    {platform = "linux", version = "^2.5.1", source = "pytorch-cpu"},
+    {platform = "darwin", url = "https://download.pytorch.org/whl/cpu/torch-2.5.1-cp311-none-macosx_11_0_arm64.whl"}
+]
 torchmetrics = "^1.5.2"
 torch-geometric = "^2.6.1"
 umap-learn = "^0.5.7"
@@ -59,10 +58,10 @@ nbdime = "^4.0.2"
 pytest = "^7.4.2"
 pytest-stub = "^1.1.0"
 
-# [[tool.poetry.source]]
-# name = "pytorch-cpu"
-# url = "https://download.pytorch.org/whl/cpu"
-# priority = "explicit"
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]

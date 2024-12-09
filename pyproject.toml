@@ -40,10 +40,11 @@ requests = "^2.31.0"
 seaborn = "^0.13.2"
 scikit-learn = "^1.5.2"
 sentence-transformers = "^3.3.1"
-torch = [
-    {platform = "linux", version = "^2.5.1", source = "pytorch-cpu"},
-    {platform = "darwin", version = "*"}
-]
+# torch = [
+#    # {platform = "linux", version = "^2.5.1", source = "pytorch-cpu"},
+#     {platform = "darwin", version = "*"}
+# ]
+torch = "^2.5.1"
 torchmetrics = "^1.5.2"
 torch-geometric = "^2.6.1"
 umap-learn = "^0.5.7"

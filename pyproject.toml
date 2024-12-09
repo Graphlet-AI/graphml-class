@@ -40,7 +40,10 @@ requests = "^2.31.0"
 seaborn = "^0.13.2"
 scikit-learn = "^1.5.2"
 sentence-transformers = "^3.3.1"
-torch = {version = "^2.5.1", source = "pytorch-cpu-src"}
+torch = [
+    {platform = "linux", version = "^2.5.1", source = "pytorch-cpu"},
+    {platform = "darwin", version = "*", source = "pytorch-cpu"}
+]
 torchmetrics = "^1.5.2"
 torch-geometric = "^2.6.1"
 umap-learn = "^0.5.7"
@@ -51,12 +54,12 @@ black = "^23.3.0"
 flake8 = "^6.0.0"
 ipython = "^8.15.0"
 isort = "^5.12.0"
-nbdime = "^3.2.1"
+nbdime = "^4.0.2"
 pytest = "^7.4.2"
 pytest-stub = "^1.1.0"
 
 [[tool.poetry.source]]
-name = "pytorch-cpu-src"
+name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 priority = "explicit"
 

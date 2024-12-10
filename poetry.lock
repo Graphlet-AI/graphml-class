@@ -3130,6 +3130,26 @@ files = [
 ptyprocess = ">=0.5"
 
 [[package]]
+name = "phart"
+version = "1.0.3"
+description = "Python Hierarchical ASCII Representation Tool - Pure Python graph visualization in ASCII, no external dependencies* (*except NetworkX)"
+optional = false
+python-versions = ">=3.10"
+files = [
+    {file = "phart-1.0.3-py3-none-any.whl", hash = "sha256:a096b8be22ad20c7562804a36d70be35aa9148736f3694631c41a97d48b1413b"},
+    {file = "phart-1.0.3.tar.gz", hash = "sha256:9fd4d91ee5b66dcca498bb28b13bbab859a74c46822b487b1f5590d5f72a2999"},
+]
+
+[package.dependencies]
+networkx = ">=3.3"
+
+[package.extras]
+developer = ["isort", "mypy (>=1.1)", "pre-commit (>=3.2)"]
+example = ["pydot (>=3.0.1)"]
+extra = ["pygraphviz (>=1.14)"]
+test = ["pydot", "pytest (>=7.2)", "pytest-cov (>=4.0)"]
+
+[[package]]
 name = "pillow"
 version = "11.0.0"
 description = "Python Imaging Library (Fork)"
@@ -5983,4 +6003,4 @@ propcache = ">=0.2.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "88d513f3ed92e38c4e88616aac679dab3edb60569f8a21879b54ed8bd555d8ee"
+content-hash = "474869b12cb10634c1a5d3c260eee4a9a614db57b7c3f71d72fc865b6683afd1"

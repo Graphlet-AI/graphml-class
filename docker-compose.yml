@@ -24,19 +24,19 @@ services:
       - .env
     restart: always
 
-  neo4j:
-    image: neo4j:5.25.1
-    container_name: neo4j
-    ports:
-      - 7474:7474
-      - 7687:7687
-    volumes:
-      - ./data/neo4j:/data
-      - ./logs/neo4j:/logs
-    environment:
-      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
-    env_file:
-      - envs/neo4j.env
-      - .env
-    restart: always
+  # neo4j:
+  #   image: neo4j:5.25.1
+  #   container_name: neo4j
+  #   ports:
+  #     - 7474:7474
+  #     - 7687:7687
+  #   volumes:
+  #     - ./data/neo4j:/data
+  #     - ./logs/neo4j:/logs
+  #   environment:
+  #     - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+  #   env_file:
+  #     - envs/neo4j.env
+  #     - .env
+  #   restart: always
 

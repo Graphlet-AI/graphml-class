@@ -81,6 +81,47 @@ def four_edge_count(paths: DataFrame) -> DataFrame:
     return graphlet_count_df
 
 
+def add_degree(g: GraphFrame) -> GraphFrame:
+    """add_degree compute the degree, adding it as a property of the nodes in the GraphFrame.
+
+    Parameters
+    ----------
+    g : GraphFrame
+        Any valid GraphFrame
+
+    Returns
+    -------
+    GraphFrame
+        Same GraphFrame with a 'degree' property added
+    """
+    degree_vertices: DataFrame = g.vertices.join(g.degrees, on="id")
+    return GraphFrame(degree_vertices, g.edges)
+
+
+def add_type_degree(g: GraphFrame) -> GraphFrame:
+    """add_type_degree add a map property to the vertices with the degree by each type of relationship.
+
+    Parameters
+    ----------
+    g : GraphFrame
+        Any valid GraphFrame
+
+    Returns
+    -------
+    GraphFrame
+        A GraphFrame with a map[type:degree] 'type_degree' field added to the vertices
+    """
+    type_degree: DataFrame = (
+        g.edges.select(F.col("src").alias("id"), "relationship")
+        .filter(F.col("id").isNotNull())
+        .groupby("id", "relationship")
+        .count()
+    )
+    type_degree = type_degree.withColumn("type_degree", F.create_map(type_degree.columns))
+    type_degree = type_degree.select("src", "type_degree")
+    return g.vertices.join(type_degree, on="src")
+
+
 # This is actually already set in Docker, just reminding you Java is needed
 os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-17-openjdk-amd64"
 
@@ -150,6 +191,9 @@ relationships_df: DataFrame = relationships_df.cache()
 # Create the GraphFrame
 #
 g = GraphFrame(nodes_df, relationships_df)
+
+# Add the degree to use as a property in the motifs
+g = add_degree(g).cache()
 
 g.vertices.show()
 g.edges.show()

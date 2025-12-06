@@ -1,6 +1,6 @@
 # Full Stack Graph Machine Learning: Theory, Practice, Tools and Techniques v1.1.2
 
-This is a course from Graphlet AI on full-stack graph machine learning taught by Russell Jurney. Contact me if you'd like to attend a session or organize one for your firm! <mailto:rjurney@graphlet.ai> :)
+This is a course from Graphlet AI on full-stack graph machine learning taught by Russell Jurney. Contact me if you'd like to attend a session or organize one for your firm! <rjurney@graphlet.ai> :)
 
 <center><img src="images/Graphlet-AI-Banner-with-Hypergraph-and-Womans-Head.jpg" alt="Graphlet AI" /></center>
 
